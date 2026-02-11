@@ -1,0 +1,17 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Firebase keys / config
+firebase-credentials.json
+google-services.json
+
+# Temporary files
+.tmp/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
