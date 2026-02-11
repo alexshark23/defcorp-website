@@ -45,18 +45,28 @@
             --bg-dark: #0a0f12;
             --bg-nav: rgba(10, 15, 18, 0.85);
             --card-bg: rgba(16, 26, 30, 0.4);
+            --modal-bg: rgba(16, 26, 30, 0.95);
             --text-main: #e2e8f0;
             --text-muted: #94a3b8;
-            --border-color: rgba(19, 200, 236, 0.08);
+            --text-slate-300: #cbd5e1;
+            --border-color: rgba(19, 200, 236, 0.12);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --modal-overlay: rgba(0, 0, 0, 0.82);
         }
 
         .light-mode {
             --bg-dark: #f8fafc;
-            --bg-nav: rgba(255, 255, 255, 0.9);
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: rgba(0, 0, 0, 0.08);
+            --bg-nav: rgba(255, 255, 255, 0.95);
+            --card-bg: #ffffff;
+            --modal-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-slate-300: #1e293b;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --input-bg: #f1f5f9;
+            --input-border: rgba(0, 0, 0, 0.15);
+            --modal-overlay: rgba(15, 23, 42, 0.65);
         }
 
         body {
@@ -66,36 +76,132 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .text-white {
+        /* Essential Theme Overrides */
+        .light-mode .text-white,
+        .light-mode .text-slate-100,
+        .light-mode .text-slate-200,
+        .light-mode h1,
+        .light-mode h2,
+        .light-mode h3,
+        .light-mode h4 {
             color: var(--text-main) !important;
         }
 
-        .text-slate-100 {
-            color: var(--text-main) !important;
+        .light-mode .text-slate-300,
+        .light-mode .text-slate-400 {
+            color: var(--text-slate-300) !important;
         }
 
-        .text-slate-400,
-        .text-slate-500 {
+        .light-mode .text-slate-500,
+        .light-mode .text-slate-600 {
             color: var(--text-muted) !important;
         }
 
-        .bg-background-dark {
+        .light-mode .bg-background-dark {
             background-color: var(--bg-dark) !important;
         }
 
-        .bg-neutral-dark {
+        .light-mode .bg-neutral-dark,
+        .light-mode .bg-white\/5,
+        .light-mode .bg-white\/\[0\.02\],
+        .light-mode .bg-white\/\[0\.03\] {
             background-color: var(--card-bg) !important;
         }
 
-        .glass-nav {
-            background: var(--bg-nav) !important;
-            border-bottom: 1px solid var(--border-color) !important;
+        .light-mode .border-white\/5,
+        .light-mode .border-white\/10,
+        .light-mode .border-white\/20,
+        .light-mode .border-primary\/20 {
+            border-color: var(--border-color) !important;
         }
 
-        .service-card,
-        .p-6.rounded-2xl {
-            background: var(--card-bg) !important;
+        .light-mode .modal-card {
+            background: var(--modal-bg) !important;
             border-color: var(--border-color) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .light-mode .modal-overlay {
+            background: var(--modal-overlay) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .light-mode input,
+        .light-mode textarea {
+            background-color: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text-main) !important;
+        }
+
+        .light-mode input::placeholder,
+        .light-mode textarea::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        .light-mode .pw-bar,
+        .light-mode .pw-bar-reset {
+            background-color: rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .light-mode footer {
+            background: #ffffff !important;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .light-mode .service-card {
+            background: #ffffff !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Futuristic Click Animation */
+        .click-pulse {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%) scale(0);
+            animation: pulseExpand 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes pulseExpand {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* Ripple Effect */
+        .ripple-glow {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            filter: blur(8px);
+            opacity: 0.6;
+            animation: rippleGlowFade 0.7s ease-out forwards;
+        }
+
+        @keyframes rippleGlowFade {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(5);
+                opacity: 0;
+            }
         }
 
         /* Animated gradient hero */
@@ -177,33 +283,6 @@
             top: 85%;
             animation-delay: 2.1s;
             width: 250px;
-        }
-
-        /* Neon Cursor Trail */
-        .neon-trail {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            pointer-events: none;
-            z-index: 10001;
-            border-radius: 50%;
-            filter: blur(4px);
-            opacity: 0.6;
-            transition: transform 0.1s ease-out;
-            animation: neonFade 0.8s ease-out forwards;
-        }
-
-        @keyframes neonFade {
-            0% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-
-            100% {
-                transform: scale(2.5);
-                opacity: 0;
-            }
         }
 
         /* Hero Watermark */
@@ -849,8 +928,8 @@
         .modal-card {
             width: 100%;
             max-width: 440px;
-            background: rgba(16, 26, 30, 0.95);
-            border: 1px solid rgba(19, 200, 236, 0.2);
+            background: var(--modal-bg);
+            border: 1px solid var(--border-color);
             border-radius: 24px;
             padding: 40px;
             transform: scale(0.9);
@@ -1790,12 +1869,31 @@
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth-compat.js"></script>
 
+    <!-- Unified Config (Gitignored for security) -->
+    <script src="config.js"></script>
+
     <script>
         // ===== Bullet Corp Unified Engine =====
         (() => {
-            // --- Configuration ---
-            const GEMINI_API_KEY = 'AIzaSyDEOIc3LwFZlevYF8WU1YUGKGUIXtJIZFs';
-            const GEMINI_MODEL = 'gemini-2.5-flash';
+            // --- Fallback Config Object if config.js is missing ---
+            const DEFAULT_CONFIG = {
+                GEMINI_API_KEY: '', // To be filled by user
+                FIREBASE_CONFIG: {
+                    apiKey: "",
+                    authDomain: "bullet-corp-59511.firebaseapp.com",
+                    projectId: "bullet-corp-59511",
+                    storageBucket: "bullet-corp-59511.firebasestorage.app",
+                    messagingSenderId: "313077552094",
+                    appId: "1:313077552094:web:39ed6008c172d1ac4a034f",
+                    measurementId: "G-WNWPHQC1T5"
+                }
+            };
+
+            const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : DEFAULT_CONFIG;
+
+            // --- Gemini Config ---
+            const GEMINI_API_KEY = appConfig.GEMINI_API_KEY;
+            const GEMINI_MODEL = 'gemini-1.5-flash'; // Using stable model for production
             const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
             const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz), a company based in Romania serving clients worldwide.
@@ -1829,16 +1927,12 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
             const chatFab = document.getElementById('chatFab');
 
             // --- Firebase Auth ---
-            const firebaseConfig = {
-                apiKey: "AIzaSyDTN4UrGgEWESLo5_3x58pHX8obECs8Idc",
-                authDomain: "bullet-corp-59511.firebaseapp.com",
-                projectId: "bullet-corp-59511",
-                storageBucket: "bullet-corp-59511.firebasestorage.app",
-                messagingSenderId: "313077552094",
-                appId: "1:313077552094:web:39ed6008c172d1ac4a034f",
-                measurementId: "G-WNWPHQC1T5"
-            };
-            firebase.initializeApp(firebaseConfig);
+            const firebaseConfig = appConfig.FIREBASE_CONFIG;
+            if (firebaseConfig.apiKey) {
+                firebase.initializeApp(firebaseConfig);
+            } else {
+                console.warn("[Bullet Portal] Firebase API Key missing. Authentication disabled.");
+            }
             const auth = firebase.auth();
             const googleProvider = new firebase.auth.GoogleAuthProvider();
 
@@ -2159,14 +2253,24 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 }
             });
 
-            // --- Neon Cursor Trail ---
-            document.addEventListener('mousemove', (e) => {
-                const trail = document.createElement('div');
-                trail.className = 'neon-trail';
-                trail.style.left = e.clientX - 4 + 'px';
-                trail.style.top = e.clientY - 4 + 'px';
-                document.body.appendChild(trail);
-                setTimeout(() => trail.remove(), 800);
+            // --- Click Animation ---
+            document.addEventListener('mousedown', (e) => {
+                const pulse = document.createElement('div');
+                pulse.className = 'click-pulse';
+                pulse.style.left = e.clientX + 'px';
+                pulse.style.top = e.clientY + 'px';
+                document.body.appendChild(pulse);
+
+                const glow = document.createElement('div');
+                glow.className = 'ripple-glow';
+                glow.style.left = e.clientX - 10 + 'px';
+                glow.style.top = e.clientY - 10 + 'px';
+                document.body.appendChild(glow);
+
+                setTimeout(() => {
+                    pulse.remove();
+                    glow.remove();
+                }, 700);
             });
 
             // --- Dark/Light Mode ---

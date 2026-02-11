@@ -1,0 +1,19 @@
+// DEF Corp Configuration
+// DO NOT COMMIT YOUR ACTUAL KEYS TO GITHUB
+// Instructions: Copy this file to 'config.js' and fill in your keys.
+
+const CONFIG = {
+    // Gemini API Key for Chatbot
+    GEMINI_API_KEY: 'YOUR_GEMINI_KEY_HERE',
+    
+    // Firebase Configuration for Portal
+    FIREBASE_CONFIG: {
+        apiKey: "YOUR_FIREBASE_KEY_HERE",
+        authDomain: "bullet-corp-59511.firebaseapp.com",
+        projectId: "bullet-corp-59511",
+        storageBucket: "bullet-corp-59511.firebasestorage.app",
+        messagingSenderId: "313077552094",
+        appId: "1:313077552094:web:39ed6008c172d1ac4a034f",
+        measurementId: "G-WNWPHQC1T5"
+    }
+};
