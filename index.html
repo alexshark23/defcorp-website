@@ -44,20 +44,6 @@
             --primary-rgb: 19, 200, 236;
             --bg-dark: #0a0f12;
             --bg-nav: rgba(10, 15, 18, 0.85);
-            --card-bg: rgba(16, 26, 30, 0.4);
-            --modal-bg: rgba(16, 26, 30, 0.95);
-            --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
-            --text-slate-300: #cbd5e1;
-            --border-color: rgba(19, 200, 236, 0.12);
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --input-border: rgba(255, 255, 255, 0.1);
-            --modal-overlay: rgba(0, 0, 0, 0.82);
-        }
-
-        .light-mode {
-            --bg-dark: #f8fafc;
-            --bg-nav: rgba(255, 255, 255, 0.95);
             --card-bg: #ffffff;
             --modal-bg: #ffffff;
             --text-main: #0f172a;
@@ -67,6 +53,20 @@
             --input-bg: #f1f5f9;
             --input-border: rgba(0, 0, 0, 0.15);
             --modal-overlay: rgba(15, 23, 42, 0.65);
+        }
+
+        :root:not(.light-mode) {
+            --bg-dark: #0a0f12;
+            --bg-nav: rgba(10, 15, 18, 0.85);
+            --card-bg: rgba(16, 26, 30, 0.4);
+            --modal-bg: rgba(16, 26, 30, 0.95);
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --text-slate-300: #cbd5e1;
+            --border-color: rgba(19, 200, 236, 0.12);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --modal-overlay: rgba(0, 0, 0, 0.82);
         }
 
         body {
@@ -94,11 +94,141 @@
 
         .light-mode .text-slate-500,
         .light-mode .text-slate-600 {
-            color: var(--text-muted) !important;
+            color: #334155 !important;
+            /* Darker Slate for A11y */
         }
 
-        .light-mode .bg-background-dark {
-            background-color: var(--bg-dark) !important;
+
+        /* Product Visualizer Carousel */
+        .visualizer-container {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .feature-slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            height: 100%;
+        }
+
+        .feature-slide.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100%);
+            }
+        }
+
+        /* Premium Gallery Styles */
+        .gallery-container {
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .gallery-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+            transform: scale(1.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-slide.active {
+            opacity: 1;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        .gallery-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10, 15, 30, 0.9), transparent 60%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            z-index: 20;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 1rem;
+            transform: translateY(-50%);
+            z-index: 30;
+        }
+
+        .gallery-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(19, 200, 236, 0.1);
+            border: 1px solid rgba(19, 200, 236, 0.2);
+            color: #13c8ec;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(4px);
+        }
+
+        .gallery-btn:hover {
+            background: rgba(19, 200, 236, 0.2);
+            transform: scale(1.1);
+        }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 30;
+        }
+
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gallery-dot.active {
+            background: #13c8ec;
+            width: 24px;
+            border-radius: 4px;
         }
 
         .light-mode .bg-neutral-dark,
@@ -229,7 +359,7 @@
             font-size: 11px;
         }
 
-        /* Speed Lines for 'Bullet' aesthetic */
+        /* Speed Lines for 'DEF' aesthetic */
         .speed-line {
             position: absolute;
             background: linear-gradient(90deg, transparent, rgba(19, 200, 236, 0.2), transparent);
@@ -286,7 +416,7 @@
         }
 
         /* Hero Watermark */
-        .bullet-watermark {
+        .def-watermark {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -482,7 +612,8 @@
         }
 
         .mobile-menu.open {
-            max-height: 300px;
+            max-height: 500px;
+            /* Increased for safety */
         }
 
         /* Loading bar */
@@ -1016,7 +1147,7 @@
 
             <div class="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
                 <!-- Background Watermark Logo -->
-                <div class="bullet-watermark">
+                <div class="def-watermark">
                     <img src="defcorp-logo.png" alt="DEF Corp Watermark" class="w-full h-full object-contain">
                 </div>
                 <div>
@@ -1027,7 +1158,7 @@
                                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                         </span>
-                        Bullet AI-Powered
+                        DEF AI-Powered
                     </div>
                     <h1 class="text-5xl lg:text-7xl font-bold leading-tight mb-6 text-white">
                         Precision Automation at <span class="text-primary italic">DEF</span> Speed
@@ -1048,85 +1179,72 @@
                     </div>
                 </div>
 
-                <!-- Dashboard mockup -->
-                <div class="relative lg:block hidden">
+                <!-- Premium Image Gallery Gallery -->
+                <div class="relative block">
                     <div
                         class="relative z-10 rounded-2xl border border-primary/20 ui-mockup-bg p-1 shadow-2xl shadow-primary/5 overflow-hidden">
-                        <div class="flex items-center justify-between px-4 py-3 border-b border-primary/10 bg-black/20">
-                            <div class="flex items-center gap-4">
-                                <div class="flex gap-1.5">
-                                    <div class="w-2.5 h-2.5 rounded-full bg-red-500/40"></div>
-                                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/40"></div>
-                                    <div class="w-2.5 h-2.5 rounded-full bg-green-500/40"></div>
-                                </div>
-                                <span
-                                    class="text-[10px] text-primary/60 font-mono tracking-widest uppercase">DEFCORE_v4.2</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] text-green-400 font-mono">ACTIVE</span>
-                                <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                            </div>
-                        </div>
-                        <div class="p-4 grid grid-cols-12 gap-4 h-[380px]">
-                            <div class="col-span-4 space-y-4">
-                                <div class="p-3 rounded-lg border border-primary/10 bg-black/40">
-                                    <div class="text-[10px] text-primary/40 uppercase font-bold mb-1">Response Time
-                                    </div>
-                                    <div class="text-xl font-bold text-white">0.02ms</div>
-                                    <div class="w-full h-1 bg-primary/10 rounded-full mt-2 overflow-hidden">
-                                        <div class="w-3/4 h-full bg-primary shadow-[0_0_8px_rgba(19,200,236,0.5)]">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="p-3 rounded-lg border border-primary/10 bg-black/40">
-                                    <div class="text-[10px] text-primary/40 uppercase font-bold mb-1">System Load</div>
-                                    <div class="text-xl font-bold text-white">84%</div>
-                                    <div class="grid grid-cols-10 gap-0.5 mt-2">
-                                        <div class="h-3 bg-primary rounded-sm"></div>
-                                        <div class="h-3 bg-primary rounded-sm"></div>
-                                        <div class="h-3 bg-primary rounded-sm"></div>
-                                        <div class="h-3 bg-primary rounded-sm"></div>
-                                        <div class="h-3 bg-primary rounded-sm"></div>
-                                        <div class="h-3 bg-primary rounded-sm"></div>
-                                        <div class="h-3 bg-primary/20 rounded-sm"></div>
-                                        <div class="h-3 bg-primary/20 rounded-sm"></div>
-                                        <div class="h-3 bg-primary/10 rounded-sm"></div>
-                                        <div class="h-3 bg-primary/10 rounded-sm"></div>
-                                    </div>
+                        <div class="gallery-container" id="projectGallery">
+                            <!-- Slide 1: AI Chatbots -->
+                            <div class="gallery-slide active">
+                                <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000"
+                                    alt="AI Chatbots">
+                                <div class="gallery-overlay">
+                                    <h4 class="text-xl font-bold text-white uppercase tracking-wider mb-1">Intelligent
+                                        AI Chatbots</h4>
+                                    <p class="text-xs text-primary/80 font-mono tracking-widest uppercase">
+                                        Advanced_Conversation_Engine_V4</p>
                                 </div>
                             </div>
-                            <div class="col-span-8 flex flex-col gap-4">
-                                <div
-                                    class="flex-grow rounded-lg border border-primary/10 bg-black/40 p-4 relative overflow-hidden">
-                                    <div class="text-[10px] text-primary/40 uppercase font-bold">Automation Performance
-                                    </div>
-                                    <div class="text-lg font-bold text-white mt-1">428 Tasks Executed <span
-                                            class="text-xs text-green-400 ml-2">+12%</span></div>
-                                    <div class="absolute inset-x-0 bottom-0 px-4 h-28 flex items-end gap-1">
-                                        <div class="w-full h-[40%] bg-primary/10 border-t-2 border-primary/40"></div>
-                                        <div class="w-full h-[60%] bg-primary/15 border-t-2 border-primary/50"></div>
-                                        <div class="w-full h-[55%] bg-primary/10 border-t-2 border-primary/40"></div>
-                                        <div class="w-full h-[75%] bg-primary/20 border-t-2 border-primary/60"></div>
-                                        <div class="w-full h-[90%] bg-primary/30 border-t-2 border-primary/80"></div>
-                                        <div class="w-full h-[85%] bg-primary/25 border-t-2 border-primary/70"></div>
-                                        <div class="w-full h-[95%] bg-primary/40 border-t-2 border-primary"></div>
-                                    </div>
+                            <!-- Slide 2: Workflows -->
+                            <div class="gallery-slide">
+                                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000"
+                                    alt="Workflow Automation">
+                                <div class="gallery-overlay">
+                                    <h4 class="text-xl font-bold text-white uppercase tracking-wider mb-1">Hyper
+                                        Workflow Automation</h4>
+                                    <p class="text-xs text-primary/80 font-mono tracking-widest uppercase">
+                                        Node_Sync_5000+_Connectors</p>
                                 </div>
-                                <div class="h-28 rounded-lg border border-primary/10 bg-black/60 p-3 font-mono">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span
-                                            class="material-symbols-outlined text-[12px] text-primary/60">terminal</span>
-                                        <span class="text-[9px] text-primary/60 uppercase">System Active</span>
-                                    </div>
-                                    <div class="space-y-1 opacity-80">
-                                        <div class="code-line text-white/70 italic">// AI pipeline running...</div>
-                                        <div class="code-line text-primary"><span class="text-white">await</span>
-                                            defcorp.automate({</div>
-                                        <div class="code-line text-white/80"> mode: <span
-                                                class="text-primary">"intelligent"</span></div>
-                                        <div class="code-line text-primary">});</div>
-                                    </div>
+                            </div>
+                            <!-- Slide 3: Cybersecurity -->
+                            <div class="gallery-slide">
+                                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000"
+                                    alt="Cybersecurity Solutions">
+                                <div class="gallery-overlay">
+                                    <h4 class="text-xl font-bold text-white uppercase tracking-wider mb-1">Elite Cyber
+                                        Defense</h4>
+                                    <p class="text-xs text-primary/80 font-mono tracking-widest uppercase">
+                                        Real-time_Threat_Neutralization</p>
                                 </div>
+                            </div>
+                            <!-- Slide 4: AI Analytics -->
+                            <div class="gallery-slide">
+                                <img src="https://images.unsplash.com/photo-1551288049-bbbda546697c?auto=format&fit=crop&q=80&w=1000"
+                                    alt="AI Analytics">
+                                <div class="gallery-overlay">
+                                    <h4 class="text-xl font-bold text-white uppercase tracking-wider mb-1">AI Predictive
+                                        Analytics</h4>
+                                    <p class="text-xs text-primary/80 font-mono tracking-widest uppercase">
+                                        Data_to_Intelligence_Pipeline</p>
+                                </div>
+                            </div>
+
+                            <!-- Navigation -->
+                            <div class="gallery-nav">
+                                <button class="gallery-btn" onclick="prevNextSlide(-1)">
+                                    <span class="material-icons-outlined">chevron_left</span>
+                                </button>
+                                <button class="gallery-btn" onclick="prevNextSlide(1)">
+                                    <span class="material-icons-outlined">chevron_right</span>
+                                </button>
+                            </div>
+
+                            <!-- Dots -->
+                            <div class="gallery-dots" id="galleryDots">
+                                <div class="gallery-dot active" onclick="jumpToSlide(0)"></div>
+                                <div class="gallery-dot" onclick="jumpToSlide(1)"></div>
+                                <div class="gallery-dot" onclick="jumpToSlide(2)"></div>
+                                <div class="gallery-dot" onclick="jumpToSlide(3)"></div>
                             </div>
                         </div>
                     </div>
@@ -1422,7 +1540,7 @@
                             <h6 class="text-white font-bold uppercase tracking-widest text-xs mb-4">Contact</h6>
                             <div class="space-y-2">
                                 <a class="block text-slate-500 hover:text-primary transition-colors text-sm"
-                                    href="mailto:contact@bulletcorp.xyz">contact@bulletcorp.xyz</a>
+                                    href="mailto:contact@defcorp.xyz">contact@defcorp.xyz</a>
                                 <span class="block text-slate-500 text-sm">Romania</span>
                             </div>
                         </div>
@@ -1490,7 +1608,7 @@
                 submitBtn.innerHTML = '<span class="animate-spin material-icons-outlined text-sm">autorenew</span> Sending...';
 
                 // Build mailto link
-                const subject = encodeURIComponent(`[Bullet Corp] ${data.service} - ${data.name}`);
+                const subject = encodeURIComponent(`[DEF Corp] ${data.service} - ${data.name}`);
                 const body = encodeURIComponent(
                     `Name: ${data.name}\nEmail: ${data.email}\nService: ${data.service}\n\nMessage:\n${data.message}`
                 );
@@ -1873,12 +1991,14 @@
     <script src="config.js"></script>
 
     <script>
-        // ===== Bullet Corp Unified Engine =====
+        // ===== DEF Corp Unified Engine =====
         (() => {
             // --- PUBLIC CONFIGURATION (Safe for GitHub Pages) ---
             // These are client-side keys used to identify the project on Google/Firebase.
             // Security is enforced via Firebase Security Rules and API Key Restrictions.
             const PUBLIC_CONFIG = {
+                // IMPORTANT: For GitHub Pages, keys are technically public. 
+                // Ensure you have restricted these keys to your domain in Google Cloud Console.
                 GEMINI_API_KEY: 'AIzaSyDEOIc3LwFZlevYF8WU1YUGKGUIXtJIZFs',
                 FIREBASE_CONFIG: {
                     apiKey: "AIzaSyDTN4UrGgEWESLo5_3x58pHX8obECs8Idc",
@@ -1967,18 +2087,32 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
 
             window.logout = function () { auth.signOut().then(() => window.location.reload()); };
 
-            // --- Google Sign-In ---
+            // --- Google Sign-In (Improved for Mobile & Redirection) ---
             window.googleSignIn = async function () {
                 const errorDiv = document.getElementById('authError');
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
                 try {
-                    await auth.signInWithPopup(googleProvider);
-                    toggleLoginModal();
+                    if (isMobile) {
+                        await auth.signInWithRedirect(googleProvider);
+                    } else {
+                        await auth.signInWithPopup(googleProvider);
+                        toggleLoginModal();
+                    }
                 } catch (err) {
                     if (err.code !== 'auth/popup-closed-by-user') {
-                        if (errorDiv) errorDiv.textContent = err.message;
+                        console.error("[Auth Error]", err);
+                        if (errorDiv) errorDiv.textContent = 'Access Denied: Authentication Error';
                     }
                 }
             };
+
+            // Handle Redirect Result for Mobile
+            auth.getRedirectResult().then((result) => {
+                if (result.user) toggleLoginModal();
+            }).catch((err) => {
+                console.error("[Redirect Error]", err);
+            });
 
             // --- Forgot Password ---
             window.forgotPassword = async function () {
@@ -1992,9 +2126,10 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 try {
                     await auth.sendPasswordResetEmail(email);
                     if (errorDiv) errorDiv.textContent = '';
-                    if (successDiv) successDiv.textContent = 'Reset link sent! Check your email.';
+                    if (successDiv) successDiv.textContent = 'Instructions sent to your inbox.';
                 } catch (err) {
-                    if (errorDiv) errorDiv.textContent = err.code === 'auth/user-not-found' ? 'No account found with this email.' : err.message;
+                    console.error("[Auth Error]", err);
+                    if (errorDiv) errorDiv.textContent = 'Access Denied: System Error';
                 }
             };
 
@@ -2007,10 +2142,11 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                     await auth.currentUser.updateProfile({ displayName: newName });
                     document.getElementById('userNameDisplay').textContent = newName;
                     document.getElementById('welcomeName').textContent = newName.split(' ')[0];
-                    msgDiv.textContent = 'Profile updated!'; msgDiv.style.color = '#22c55e';
+                    msgDiv.textContent = 'Settings preserved.'; msgDiv.style.color = '#22c55e';
                     setTimeout(() => msgDiv.textContent = '', 3000);
                 } catch (err) {
-                    msgDiv.textContent = err.message; msgDiv.style.color = '#ef4444';
+                    console.error("[Profile Error]", err);
+                    msgDiv.textContent = 'Access Denied: Sync Error'; msgDiv.style.color = '#ef4444';
                 }
             };
 
@@ -2028,13 +2164,13 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                     const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPass);
                     await user.reauthenticateWithCredential(cred);
                     await user.updatePassword(newPass);
-                    msgDiv.textContent = 'Password updated!'; msgDiv.style.color = '#22c55e';
+                    msgDiv.textContent = 'Security credentials updated.'; msgDiv.style.color = '#22c55e';
                     document.getElementById('currentPass').value = '';
                     document.getElementById('newPass').value = '';
                     setTimeout(() => msgDiv.textContent = '', 3000);
                 } catch (err) {
-                    const msg = err.code === 'auth/wrong-password' ? 'Current password is incorrect.' : err.message;
-                    msgDiv.textContent = msg; msgDiv.style.color = '#ef4444';
+                    console.error("[Pass Error]", err);
+                    msgDiv.textContent = 'Access Denied: Credential Mismatch'; msgDiv.style.color = '#ef4444';
                 }
             };
 
@@ -2143,6 +2279,12 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 return div;
             };
 
+            const MODELS = [
+                'gemini-2.5-flash',
+                'gemini-2.0-flash',
+                'gemini-1.5-flash'
+            ];
+
             const sendMessage = async () => {
                 const text = input.value.trim();
                 if (!text || isLoading) return;
@@ -2155,42 +2297,55 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 typing.innerHTML = '<span></span><span></span><span></span>';
                 messagesDiv.appendChild(typing);
 
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                            contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
-                        })
-                    });
+                let botResponseText = "";
+                let success = false;
 
-                    typing.remove();
+                // Multi-model Fallback Logic
+                for (const model of MODELS) {
+                    try {
+                        console.log(`[DEF AI] Attempting with ${model}...`);
+                        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                                contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
+                            })
+                        });
 
-                    if (!response.ok) {
-                        const errData = await response.json().catch(() => ({}));
-                        console.error('[Bullet AI] API Error:', response.status, errData);
-                        throw new Error(`API ${response.status}`);
+                        if (!response.ok) {
+                            const errData = await response.json().catch(() => ({}));
+                            console.warn(`[DEF AI] ${model} failed:`, response.status, errData);
+                            continue;
+                        }
+
+                        const data = await response.json();
+                        botResponseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error processing request.";
+                        success = true;
+                        break;
+                    } catch (e) {
+                        console.warn(`[DEF AI] ${model} error:`, e.reason || e.message || e);
                     }
+                }
 
-                    const data = await response.json();
-                    const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error processing request.";
+                typing.remove();
 
+                if (success) {
                     conversationHistory.push(
                         { role: 'user', parts: [{ text }] },
-                        { role: 'model', parts: [{ text: botText }] }
+                        { role: 'model', parts: [{ text: botResponseText }] }
                     );
                     if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
-                    addMessage(botText, 'bot');
-                } catch (e) {
-                    typing.remove();
-                    console.error('[Bullet AI] All models failed:', e);
-                    addMessage("AI temporarily unavailable. Please try again shortly or email **contact@bulletcorp.xyz**.", 'bot');
-                } finally {
-                    isLoading = false;
-                    sendBtn.disabled = false;
-                    input.focus();
+                    addMessage(botResponseText, 'bot');
+                } else {
+                    console.error('[DEF AI] All models failed.');
+                    addMessage("AI temporarily unavailable. Please try again shortly or email **contact@defcorp.xyz**.", 'bot');
                 }
+
+                isLoading = false;
+                sendBtn.disabled = false;
+                input.focus();
             };
 
             sendBtn?.addEventListener('click', sendMessage);
@@ -2235,17 +2390,16 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                         await auth.signInWithEmailAndPassword(email, pass);
                     }
                     toggleLoginModal();
+                    // Auto-refresh to ensure dashboard state
+                    setTimeout(() => window.location.reload(), 500);
                 } catch (err) {
-                    const messages = {
-                        'auth/email-already-in-use': 'This email is already registered.',
-                        'auth/invalid-email': 'Invalid email address.',
-                        'auth/weak-password': 'Password must be at least 6 characters.',
-                        'auth/user-not-found': 'No account found with this email.',
-                        'auth/wrong-password': 'Incorrect password.',
-                        'auth/invalid-credential': 'Invalid email or password.',
-                        'auth/too-many-requests': 'Too many attempts. Try again later.'
-                    };
-                    const msg = messages[err.code] || err.message;
+                    console.error("[Auth Error]", err);
+                    let msg = 'Access Denied';
+                    if (err.code === 'auth/wrong-password') msg = 'Invalid password. Please try again.';
+                    if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
+                    if (err.code === 'auth/invalid-email') msg = 'Invalid email format.';
+                    if (err.code === 'auth/network-request-failed') msg = 'Network error. Check your connection.';
+
                     if (errorDiv) errorDiv.textContent = msg;
                     else alert(msg);
                 } finally {
@@ -2292,6 +2446,36 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 document.getElementById('landingPage').classList.remove('hidden');
                 document.getElementById('chatFab').classList.remove('hidden');
             };
+
+            // --- Premium Gallery Logic ---
+            const gSlides = document.querySelectorAll('.gallery-slide');
+            const gDots = document.querySelectorAll('.gallery-dot');
+            let gIdx = 0;
+            let gTimer = null;
+
+            function showSlide(n) {
+                gSlides[gIdx].classList.remove('active');
+                gDots[gIdx].classList.remove('active');
+                gIdx = (n + gSlides.length) % gSlides.length;
+                gSlides[gIdx].classList.add('active');
+                gDots[gIdx].classList.add('active');
+            }
+
+            window.prevNextSlide = (step) => {
+                resetTimer();
+                showSlide(gIdx + step);
+            };
+
+            window.jumpToSlide = (n) => {
+                resetTimer();
+                showSlide(n);
+            };
+
+            function resetTimer() {
+                clearInterval(gTimer);
+                gTimer = setInterval(() => showSlide(gIdx + 1), 6000);
+            }
+            if (gSlides.length > 0) resetTimer();
         })();
 
         const loginModal = document.getElementById('loginModal');
