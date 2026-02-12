@@ -16,7 +16,8 @@
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -32,7 +33,10 @@
                         "background-dark": "#0a0f12",
                         "neutral-dark": "#162a2e",
                     },
-                    fontFamily: { "display": ["Space Grotesk"] },
+                    fontFamily: {
+                        "display": ["Syne", "sans-serif"],
+                        "body": ["Outfit", "sans-serif"]
+                    },
                     borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
                 },
             },
@@ -43,43 +47,78 @@
             --primary: #13c8ec;
             --primary-rgb: 19, 200, 236;
             --bg-dark: #0a0f12;
-            --bg-nav: rgba(10, 15, 18, 0.85);
+            --bg-nav: rgba(10, 15, 18, 0.9);
+            --card-bg: rgba(16, 26, 30, 0.5);
+            --modal-bg: rgba(16, 26, 30, 0.98);
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: rgba(19, 200, 236, 0.15);
+            --input-bg: rgba(255, 255, 255, 0.03);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --modal-overlay: rgba(0, 0, 0, 0.9);
+        }
+
+        :root.light-mode {
+            --bg-dark: #f8fafc;
+            --bg-nav: rgba(255, 255, 255, 0.9);
             --card-bg: #ffffff;
             --modal-bg: #ffffff;
             --text-main: #0f172a;
-            --text-muted: #475569;
-            --text-slate-300: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
             --border-color: rgba(0, 0, 0, 0.1);
             --input-bg: #f1f5f9;
             --input-border: rgba(0, 0, 0, 0.15);
-            --modal-overlay: rgba(15, 23, 42, 0.65);
-        }
-
-        :root:not(.light-mode) {
-            --bg-dark: #0a0f12;
-            --bg-nav: rgba(10, 15, 18, 0.85);
-            --card-bg: rgba(16, 26, 30, 0.4);
-            --modal-bg: rgba(16, 26, 30, 0.95);
-            --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
-            --text-slate-300: #cbd5e1;
-            --border-color: rgba(19, 200, 236, 0.12);
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --input-border: rgba(255, 255, 255, 0.1);
-            --modal-overlay: rgba(0, 0, 0, 0.82);
+            --modal-overlay: rgba(15, 23, 42, 0.6);
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Outfit', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-display {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Animated Mesh Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(at 0% 0%, hsla(190, 85%, 50%, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(210, 85%, 50%, 0.1) 0, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(190, 85%, 50%, 0.15) 0, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(210, 85%, 50%, 0.1) 0, transparent 50%);
+            background-color: var(--bg-dark);
+            filter: blur(80px);
+            animation: meshMove 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes meshMove {
+            0% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(1.1);
+            }
         }
 
         /* Essential Theme Overrides */
-        .light-mode .text-white,
-        .light-mode .text-slate-100,
-        .light-mode .text-slate-200,
         .light-mode h1,
         .light-mode h2,
         .light-mode h3,
@@ -87,15 +126,8 @@
             color: var(--text-main) !important;
         }
 
-        .light-mode .text-slate-300,
-        .light-mode .text-slate-400 {
-            color: var(--text-slate-300) !important;
-        }
-
-        .light-mode .text-slate-500,
-        .light-mode .text-slate-600 {
-            color: #334155 !important;
-            /* Darker Slate for A11y */
+        .light-mode p {
+            color: var(--text-secondary) !important;
         }
 
 
@@ -139,14 +171,15 @@
             position: relative;
             overflow: hidden;
             border-radius: 12px;
+            background: none;
         }
 
         .gallery-slide {
             position: absolute;
             inset: 0;
             opacity: 0;
-            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
-            transform: scale(1.05);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(1.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -279,7 +312,7 @@
         }
 
         .light-mode .service-card {
-            background: #ffffff !important;
+            background: var(--card-bg) !important;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
         }
 
@@ -340,13 +373,13 @@
         }
 
         .glass-nav {
-            background: rgba(10, 15, 18, 0.85);
+            background: var(--bg-nav);
             backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(19, 200, 236, 0.08);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .grid-pattern {
-            background-image: radial-gradient(rgba(19, 200, 236, 0.07) 1px, transparent 1px);
+            background-image: radial-gradient(rgba(var(--primary-rgb), 0.08) 1px, transparent 1px);
             background-size: 40px 40px;
         }
 
@@ -528,9 +561,10 @@
         }
 
         .service-card:hover {
-            border-color: rgba(19, 200, 236, 0.4);
-            transform: translateY(-6px);
-            box-shadow: 0 20px 40px -15px rgba(19, 200, 236, 0.15);
+            border-color: rgba(19, 200, 236, 0.6);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(19, 200, 236, 0.2);
+            background: rgba(19, 200, 236, 0.05);
         }
 
         /* Button press */
@@ -640,8 +674,8 @@
 
         /* Select styling */
         select option {
-            background: #0a0f12;
-            color: #e2e8f0;
+            background: var(--bg-dark);
+            color: var(--text-main);
         }
 
         /* ===== Chatbot Widget ===== */
@@ -1074,7 +1108,8 @@
     </style>
 </head>
 
-<body class="bg-background-dark text-slate-100 font-display">
+<body class="font-body">
+    <div class="mesh-bg"></div>
 
     <!-- Page loader -->
     <div class="page-loader"></div>
@@ -1083,13 +1118,13 @@
     <div id="landingPage">
 
         <!-- Navigation -->
-        <nav class="fixed top-0 w-full z-50 glass-nav">
+        <nav class="fixed top-0 w-full z-50 glass-nav border-b border-primary/10">
             <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <a href="#" class="flex items-center gap-2">
                     <div class="w-10 h-10 bg-primary/10 rounded flex items-center justify-center p-1.5 overflow-hidden">
                         <img src="defcorp-logo.png" alt="DEF Corp" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-2xl font-bold tracking-tight text-white uppercase">DEF <span
+                    <span class="text-2xl font-bold tracking-tight uppercase">DEF <span
                             class="text-primary">Corp</span></span>
                 </a>
                 <div class="hidden md:flex items-center gap-10">
@@ -1113,7 +1148,7 @@
                     Get Started
                 </a>
                 <!-- Mobile menu button -->
-                <button id="mobileBtn" class="md:hidden text-white">
+                <button id="mobileBtn" class="md:hidden">
                     <span class="material-icons-outlined text-2xl">menu</span>
                 </button>
             </div>
@@ -1160,20 +1195,20 @@
                         </span>
                         DEF AI-Powered
                     </div>
-                    <h1 class="text-5xl lg:text-7xl font-bold leading-tight mb-6 text-white">
+                    <h1 class="text-5xl lg:text-7xl font-bold leading-tight mb-6">
                         Precision Automation at <span class="text-primary italic">DEF</span> Speed
                     </h1>
-                    <p class="text-xl text-slate-400 mb-10 max-w-xl leading-relaxed">
+                    <p class="text-xl text-secondary mb-10 max-w-xl leading-relaxed">
                         Custom chatbots, workflow automations, and cybersecurity solutions. Built fast, built to scale.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a href="#contact"
-                            class="ripple btn-press glow-pulse px-8 py-4 bg-primary text-background-dark font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
+                            class="ripple btn-press glow-pulse px-8 py-4 bg-primary text-slate-900 font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
                             Start a Project
                             <span class="material-icons-outlined">arrow_forward</span>
                         </a>
                         <a href="#services"
-                            class="ripple btn-press px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-lg hover:bg-white/10 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
+                            class="ripple btn-press px-8 py-4 bg-white/5 border border-primary/20 font-bold rounded-lg hover:bg-white/10 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
                             Explore Services
                         </a>
                     </div>
@@ -1186,21 +1221,21 @@
                         <div class="gallery-container" id="projectGallery">
                             <!-- Slide 1: AI Chatbots -->
                             <div class="gallery-slide active">
-                                <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000"
-                                    alt="AI Chatbots">
+                                <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop"
+                                    alt="Intelligent AI Chatbot Interface" loading="lazy">
                                 <div class="gallery-overlay">
-                                    <h4 class="text-xl font-bold text-white uppercase tracking-wider mb-1">Intelligent
+                                    <h4 class="text-xl font-bold uppercase tracking-wider mb-1">Intelligent
                                         AI Chatbots</h4>
                                     <p class="text-xs text-primary/80 font-mono tracking-widest uppercase">
                                         Advanced_Conversation_Engine_V4</p>
                                 </div>
                             </div>
-                            <!-- Slide 2: Workflows -->
+                            <!-- Slide 2: Workflow Automation -->
                             <div class="gallery-slide">
-                                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000"
-                                    alt="Workflow Automation">
+                                <img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?q=80&w=1000&auto=format&fit=crop"
+                                    alt="Workflow Automation Nodes" loading="lazy">
                                 <div class="gallery-overlay">
-                                    <h4 class="text-xl font-bold text-white uppercase tracking-wider mb-1">Hyper
+                                    <h4 class="text-xl font-bold uppercase tracking-wider mb-1">Hyper
                                         Workflow Automation</h4>
                                     <p class="text-xs text-primary/80 font-mono tracking-widest uppercase">
                                         Node_Sync_5000+_Connectors</p>
@@ -1208,21 +1243,21 @@
                             </div>
                             <!-- Slide 3: Cybersecurity -->
                             <div class="gallery-slide">
-                                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000"
-                                    alt="Cybersecurity Solutions">
+                                <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1000&auto=format&fit=crop"
+                                    alt="Digital Cybersecurity Grid" loading="lazy">
                                 <div class="gallery-overlay">
-                                    <h4 class="text-xl font-bold text-white uppercase tracking-wider mb-1">Elite Cyber
+                                    <h4 class="text-xl font-bold uppercase tracking-wider mb-1">Elite Cyber
                                         Defense</h4>
                                     <p class="text-xs text-primary/80 font-mono tracking-widest uppercase">
                                         Real-time_Threat_Neutralization</p>
                                 </div>
                             </div>
-                            <!-- Slide 4: AI Analytics -->
+                            <!-- Slide 4: Predictive Analytics -->
                             <div class="gallery-slide">
-                                <img src="https://images.unsplash.com/photo-1551288049-bbbda546697c?auto=format&fit=crop&q=80&w=1000"
-                                    alt="AI Analytics">
+                                <img src="https://images.unsplash.com/photo-1551288049-bbbda536ad0a?q=80&w=1000&auto=format&fit=crop"
+                                    alt="Advanced Data Analytics Dashboard" loading="lazy">
                                 <div class="gallery-overlay">
-                                    <h4 class="text-xl font-bold text-white uppercase tracking-wider mb-1">AI Predictive
+                                    <h4 class="text-xl font-bold uppercase tracking-wider mb-1">AI Predictive
                                         Analytics</h4>
                                     <p class="text-xs text-primary/80 font-mono tracking-widest uppercase">
                                         Data_to_Intelligence_Pipeline</p>
@@ -1259,8 +1294,8 @@
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center max-w-2xl mx-auto mb-16 reveal">
                     <h2 class="text-primary font-bold uppercase tracking-widest text-sm mb-4">What We Build</h2>
-                    <h3 class="text-4xl font-bold mb-4 text-white">AI Solutions That Work</h3>
-                    <p class="text-slate-400">Integrating seamlessly into your stack for immediate results.</p>
+                    <h3 class="text-4xl font-bold mb-4">AI Solutions That Work</h3>
+                    <p class="text-secondary">Integrating seamlessly into your stack for immediate results.</p>
                 </div>
                 <div class="grid md:grid-cols-3 gap-8 stagger">
                     <div
@@ -1268,8 +1303,8 @@
                         <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
                             <span class="material-icons-outlined text-primary text-3xl">forum</span>
                         </div>
-                        <h4 class="text-xl font-bold mb-3 text-white">AI Chatbots</h4>
-                        <p class="text-slate-400 leading-relaxed mb-6">24/7 intelligent customer engagement across 50+
+                        <h4 class="text-xl font-bold mb-3">AI Chatbots</h4>
+                        <p class="text-secondary leading-relaxed mb-6">24/7 intelligent customer engagement across 50+
                             languages. WhatsApp, Telegram, website — everywhere your customers are.</p>
                         <a class="mt-auto flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs hover:gap-4 transition-all"
                             href="#contact">
@@ -1281,8 +1316,8 @@
                         <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
                             <span class="material-icons-outlined text-primary text-3xl">account_tree</span>
                         </div>
-                        <h4 class="text-xl font-bold mb-3 text-white">Workflow Automation</h4>
-                        <p class="text-slate-400 leading-relaxed mb-6">Eliminate manual work. Connect your apps,
+                        <h4 class="text-xl font-bold mb-3">Workflow Automation</h4>
+                        <p class="text-secondary leading-relaxed mb-6">Eliminate manual work. Connect your apps,
                             automate
                             pipelines, generate reports — with 5000+ integrations.</p>
                         <a class="mt-auto flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs hover:gap-4 transition-all"
@@ -1295,8 +1330,8 @@
                         <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
                             <span class="material-icons-outlined text-primary text-3xl">shield</span>
                         </div>
-                        <h4 class="text-xl font-bold mb-3 text-white">Cybersecurity</h4>
-                        <p class="text-slate-400 leading-relaxed mb-6">Vulnerability assessments, penetration testing,
+                        <h4 class="text-xl font-bold mb-3">Cybersecurity</h4>
+                        <p class="text-secondary leading-relaxed mb-6">Vulnerability assessments, penetration testing,
                             and
                             AI-powered monitoring. Protect your business from threats.</p>
                         <a class="mt-auto flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs hover:gap-4 transition-all"
@@ -1313,14 +1348,15 @@
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center max-w-2xl mx-auto mb-16 reveal">
                     <h2 class="text-primary font-bold uppercase tracking-widest text-sm mb-4">Pricing</h2>
-                    <h3 class="text-4xl font-bold mb-4 text-white">Transparent. No Surprises.</h3>
-                    <p class="text-slate-400">Source code included. Support included. Always.</p>
+                    <h3 class="text-4xl font-bold mb-4">Transparent. No Surprises.</h3>
+                    <p class="text-secondary">Source code included. Support included. Always.</p>
                 </div>
                 <div class="grid md:grid-cols-3 gap-8 stagger">
-                    <div class="service-card p-10 rounded-xl bg-neutral-dark/20 flex flex-col">
-                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Starter</h4>
-                        <div class="text-5xl font-bold text-white mb-2">$150</div>
-                        <p class="text-sm text-slate-500 mb-8">For small businesses</p>
+                    <div
+                        class="service-card p-10 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/10 flex flex-col">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-muted mb-4">Starter</h4>
+                        <div class="text-5xl font-bold mb-2">$150</div>
+                        <p class="text-sm text-muted mb-8">For small businesses</p>
                         <ul class="space-y-3 mb-8 flex-grow">
                             <li class="flex items-center gap-3 text-sm text-slate-400"><span
                                     class="material-icons-outlined text-primary text-base">check_circle</span> Basic AI
@@ -1329,10 +1365,10 @@
                                     class="material-icons-outlined text-primary text-base">check_circle</span> 1
                                 automation
                                 workflow</li>
-                            <li class="flex items-center gap-3 text-sm text-slate-400"><span
+                            <li class="flex items-center gap-3 text-sm text-secondary"><span
                                     class="material-icons-outlined text-primary text-base">check_circle</span> 7 days
                                 support</li>
-                            <li class="flex items-center gap-3 text-sm text-slate-400"><span
+                            <li class="flex items-center gap-3 text-sm text-secondary"><span
                                     class="material-icons-outlined text-primary text-base">check_circle</span> Source
                                 code
                                 included</li>
@@ -1341,13 +1377,13 @@
                             class="btn-press w-full py-3 border border-primary/30 text-primary rounded-lg hover:bg-primary/10 transition-all text-sm font-bold uppercase tracking-widest text-center block">Select</a>
                     </div>
                     <div
-                        class="service-card p-10 rounded-xl bg-neutral-dark/20 flex flex-col relative border-primary/30">
+                        class="service-card p-10 rounded-2xl bg-white/[0.05] backdrop-blur-2xl flex flex-col relative border-primary/30 shadow-xl shadow-primary/10">
                         <div
                             class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-background-dark text-[10px] font-bold uppercase tracking-widest rounded-full">
                             Best Value</div>
-                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Professional</h4>
-                        <div class="text-5xl font-bold text-white mb-2">$300</div>
-                        <p class="text-sm text-slate-500 mb-8">For growing businesses</p>
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-muted mb-4">Professional</h4>
+                        <div class="text-5xl font-bold mb-2">$300</div>
+                        <p class="text-sm text-muted mb-8">For growing businesses</p>
                         <ul class="space-y-3 mb-8 flex-grow">
                             <li class="flex items-center gap-3 text-sm text-slate-400"><span
                                     class="material-icons-outlined text-primary text-base">check_circle</span> Advanced
@@ -1366,14 +1402,14 @@
                                 dashboard</li>
                         </ul>
                         <a href="#contact"
-                            class="btn-press glow-pulse w-full py-3 bg-primary text-background-dark rounded-lg hover:brightness-110 transition-all text-sm font-bold uppercase tracking-widest text-center block">Select</a>
+                            class="btn-press glow-pulse w-full py-3 bg-primary text-slate-900 rounded-lg hover:brightness-110 transition-all text-sm font-bold uppercase tracking-widest text-center block">Select</a>
                     </div>
-                    <div class="service-card p-10 rounded-xl bg-neutral-dark/20 flex flex-col">
-                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Enterprise</h4>
-                        <div class="text-5xl font-bold text-white mb-2">$600<span
-                                class="text-2xl text-slate-500">+</span>
+                    <div
+                        class="service-card p-10 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/10 flex flex-col">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-muted mb-4">Enterprise</h4>
+                        <div class="text-5xl font-bold mb-2">$600<span class="text-2xl text-muted">+</span>
                         </div>
-                        <p class="text-sm text-slate-500 mb-8">Full AI transformation</p>
+                        <p class="text-sm text-muted mb-8">Full AI transformation</p>
                         <ul class="space-y-3 mb-8 flex-grow">
                             <li class="flex items-center gap-3 text-sm text-slate-400"><span
                                     class="material-icons-outlined text-primary text-base">check_circle</span> Unlimited
@@ -1406,9 +1442,9 @@
                 <div class="grid lg:grid-cols-2 gap-16 items-start">
                     <div class="reveal">
                         <h2 class="text-primary font-bold uppercase tracking-widest text-sm mb-4">Contact</h2>
-                        <h3 class="text-4xl font-bold mb-6 text-white leading-tight">Let's Work<br><span
+                        <h3 class="text-4xl font-bold mb-6 leading-tight">Let's Work<br><span
                                 class="text-primary italic">Together</span></h3>
-                        <p class="text-slate-400 mb-10 leading-relaxed max-w-md">
+                        <p class="text-secondary mb-10 leading-relaxed max-w-md">
                             Send us a message. We respond within 2 hours during business days.
                         </p>
                         <div class="space-y-5">
@@ -1422,7 +1458,7 @@
                                         Email
                                     </div>
                                     <a href="mailto:contact@defcorp.xyz"
-                                        class="text-white hover:text-primary transition-colors font-medium text-sm">contact@defcorp.xyz</a>
+                                        class="hover:text-primary transition-colors font-medium text-sm">contact@defcorp.xyz</a>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
@@ -1433,7 +1469,7 @@
                                 <div>
                                     <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-0.5">
                                         Location</div>
-                                    <span class="text-white font-medium text-sm">Romania — Serving Worldwide</span>
+                                    <span class="font-medium text-sm">Romania — Serving Worldwide</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
@@ -1444,7 +1480,7 @@
                                 <div>
                                     <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-0.5">
                                         Response</div>
-                                    <span class="text-white font-medium text-sm">Within 2 hours</span>
+                                    <span class="font-medium text-sm">Within 2 hours</span>
                                 </div>
                             </div>
                         </div>
@@ -1454,21 +1490,21 @@
                         <form id="contactForm" class="space-y-5">
                             <div>
                                 <label
-                                    class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Name</label>
+                                    class="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Name</label>
                                 <input type="text" name="name" placeholder="Your name" required
-                                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-slate-600 text-white" />
+                                    class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-muted" />
                             </div>
                             <div>
                                 <label
-                                    class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Email</label>
+                                    class="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Email</label>
                                 <input type="email" name="email" placeholder="you@company.com" required
-                                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-slate-600 text-white" />
+                                    class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-muted" />
                             </div>
                             <div>
                                 <label
-                                    class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Service</label>
+                                    class="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Service</label>
                                 <select name="service" required
-                                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all text-slate-400">
+                                    class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all text-secondary">
                                     <option value="" disabled selected>Choose a service...</option>
                                     <option value="AI Chatbot">AI Chatbot</option>
                                     <option value="Workflow Automation">Workflow Automation</option>
@@ -1478,12 +1514,12 @@
                             </div>
                             <div>
                                 <label
-                                    class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Message</label>
+                                    class="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Message</label>
                                 <textarea name="message" rows="3" placeholder="Tell us about your project..." required
-                                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-slate-600 resize-none text-white"></textarea>
+                                    class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-muted resize-none"></textarea>
                             </div>
                             <button type="submit" id="submitBtn"
-                                class="btn-press ripple w-full py-4 bg-primary text-background-dark font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
+                                class="btn-press ripple w-full py-4 bg-primary text-slate-900 font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
                                 Send Message
                                 <span class="material-icons-outlined text-sm">send</span>
                             </button>
@@ -1496,8 +1532,8 @@
                                 class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <span class="material-icons-outlined text-primary text-3xl">check_circle</span>
                             </div>
-                            <h4 class="text-xl font-bold text-white mb-2">Message Sent!</h4>
-                            <p class="text-slate-400 text-sm">We'll get back to you within 2 hours.</p>
+                            <h4 class="text-xl font-bold mb-2">Message Sent!</h4>
+                            <p class="text-muted text-sm">We'll get back to you within 2 hours.</p>
                             <button onclick="resetForm()"
                                 class="mt-6 text-primary text-sm font-bold uppercase tracking-widest hover:underline">Send
                                 Another</button>
@@ -1508,7 +1544,7 @@
         </section>
 
         <!-- Footer -->
-        <footer class="py-16 border-t border-white/5">
+        <footer class="py-16 border-t border-primary/10">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="flex flex-col md:flex-row justify-between items-start gap-12 mb-12">
                     <div>
@@ -1517,38 +1553,39 @@
                                 class="w-8 h-8 bg-primary/10 rounded flex items-center justify-center p-1 overflow-hidden">
                                 <img src="defcorp-logo.png" alt="DEF Corp" class="w-full h-full object-contain">
                             </div>
-                            <span class="text-xl font-bold tracking-tight text-white uppercase">DEF <span
+                            <span class="text-xl font-bold tracking-tight uppercase">DEF <span
                                     class="text-primary">Corp</span></span>
                         </a>
-                        <p class="text-slate-500 text-sm max-w-xs">AI automation and cybersecurity for modern
+                        <p class="text-muted text-sm max-w-xs">AI automation and cybersecurity for modern
                             businesses.
                         </p>
                     </div>
                     <div class="flex gap-16">
                         <div>
-                            <h6 class="text-white font-bold uppercase tracking-widest text-xs mb-4">Links</h6>
+                            <h6 class="font-bold uppercase tracking-widest text-xs mb-4">Links</h6>
                             <div class="space-y-2">
-                                <a class="block text-slate-500 hover:text-primary transition-colors text-sm"
+                                <a class="block text-muted hover:text-primary transition-colors text-sm"
                                     href="#services">Services</a>
-                                <a class="block text-slate-500 hover:text-primary transition-colors text-sm"
+                                <a class="block text-muted hover:text-primary transition-colors text-sm"
                                     href="#pricing">Pricing</a>
-                                <a class="block text-slate-500 hover:text-primary transition-colors text-sm"
+                                <a class="block text-muted hover:text-primary transition-colors text-sm"
                                     href="#contact">Contact</a>
                             </div>
                         </div>
                         <div>
                             <h6 class="text-white font-bold uppercase tracking-widest text-xs mb-4">Contact</h6>
                             <div class="space-y-2">
-                                <a class="block text-slate-500 hover:text-primary transition-colors text-sm"
+                                <a class="block text-muted hover:text-primary transition-colors text-sm"
                                     href="mailto:contact@defcorp.xyz">contact@defcorp.xyz</a>
-                                <span class="block text-slate-500 text-sm">Romania</span>
+                                <span class="block text-muted text-sm">Romania</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p class="text-xs text-slate-600 uppercase tracking-widest">© 2026 DEF Corp</p>
-                    <p class="text-xs text-slate-600 uppercase tracking-widest">Powered by DEF AI</p>
+                <div
+                    class="pt-8 border-t border-primary/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-xs text-muted uppercase tracking-widest">© 2026 DEF Corp</p>
+                    <p class="text-xs text-muted uppercase tracking-widest">Powered by DEF AI</p>
                 </div>
             </div>
         </footer>
@@ -1619,6 +1656,15 @@
                 // Open mailto
                 window.location.href = `mailto:contact@defcorp.xyz?subject=${subject}&body=${body}`;
 
+                // Copy to clipboard (as fallback for mailto)
+                try {
+                    const plainBody = `Name: ${data.name}\nEmail: ${data.email}\nService: ${data.service}\n\nMessage:\n${data.message}`;
+                    await navigator.clipboard.writeText(plainBody);
+                    console.log("[Contact] Message copied to clipboard as fallback.");
+                } catch (err) {
+                    console.warn("[Contact] Clipboard access denied.");
+                }
+
                 // Show success
                 form.classList.add('hidden');
                 document.getElementById('formSuccess').classList.remove('hidden');
@@ -1653,7 +1699,7 @@
                     <div class="w-10 h-10 bg-primary/10 rounded flex items-center justify-center p-1.5 overflow-hidden">
                         <img src="defcorp-logo.png" alt="DEF Corp" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-2xl font-bold tracking-tight text-white uppercase">DEF <span
+                    <span class="text-2xl font-bold tracking-tight uppercase">DEF <span
                             class="text-primary">Portal</span></span>
                 </div>
                 <div class="flex items-center gap-6">
@@ -1662,7 +1708,7 @@
                         <span class="material-symbols-outlined text-[16px]">arrow_back</span> Return to Site
                     </button>
                     <div class="hidden sm:block text-right">
-                        <div id="userNameDisplay" class="text-white text-sm font-bold">Client User</div>
+                        <div id="userNameDisplay" class="text-sm font-bold">Client User</div>
                         <div id="userEmailDisplay" class="text-slate-500 text-[10px] uppercase tracking-widest">
                             Enterprise Plan</div>
                     </div>
@@ -1702,16 +1748,16 @@
             </div>
 
             <section>
-                <h2 class="text-xl font-bold text-white mb-6 uppercase tracking-tight">Active Services</h2>
+                <h2 class="text-xl font-bold mb-6 uppercase tracking-tight">Active Services</h2>
                 <div class="space-y-4">
-                    <div class="p-5 rounded-xl border border-white/5 bg-white/[0.03] flex items-center justify-between">
+                    <div class="p-5 rounded-xl border border-primary/10 bg-card-bg flex items-center justify-between">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                                 <span class="material-icons-outlined text-primary">smart_toy</span>
                             </div>
                             <div>
-                                <div class="text-white font-bold">Enterprise Chatbot V2</div>
-                                <div class="text-slate-500 text-xs">Live on primary domain</div>
+                                <div class="font-bold">Enterprise Chatbot V2</div>
+                                <div class="text-muted text-xs">Live on primary domain</div>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
@@ -1727,21 +1773,21 @@
 
             <!-- User Profile Section -->
             <section class="mt-12">
-                <h2 class="text-xl font-bold text-white mb-6 uppercase tracking-tight flex items-center gap-2">
+                <h2 class="text-xl font-bold mb-6 uppercase tracking-tight flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">settings</span>
                     Account Settings
                 </h2>
                 <div class="grid md:grid-cols-2 gap-6">
                     <!-- Profile Info -->
-                    <div class="p-6 rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
-                        <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-4">Profile</h3>
+                    <div class="p-6 rounded-2xl border border-primary/10 bg-card-bg backdrop-blur-sm">
+                        <h3 class="text-sm font-bold uppercase tracking-widest mb-4">Profile</h3>
                         <div class="space-y-4">
                             <div>
                                 <label
-                                    class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Display
+                                    class="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Display
                                     Name</label>
                                 <input type="text" id="profileName" placeholder="Your Name"
-                                    class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-slate-600 text-white">
+                                    class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-muted">
                             </div>
                             <div>
                                 <label
@@ -1750,7 +1796,7 @@
                                     class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-500 cursor-not-allowed">
                             </div>
                             <button onclick="updateProfileName()"
-                                class="btn-press w-full py-3 bg-primary text-background-dark font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider text-sm">
+                                class="btn-press w-full py-3 bg-primary text-slate-900 font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider text-sm">
                                 Save Changes
                             </button>
                             <p id="profileMsg" class="text-xs text-center mt-1"></p>
@@ -1789,7 +1835,7 @@
                                                 id="pwBarReset4"></div>
                                         </div>
                                         <span id="pwLabelReset"
-                                            class="text-[10px] font-bold uppercase tracking-widest text-slate-500"></span>
+                                            class="text-[10px] font-bold uppercase tracking-widest text-muted"></span>
                                     </div>
                                     <div class="space-y-1">
                                         <div class="pw-rule-reset flex items-center gap-2 text-[11px]"
@@ -1839,7 +1885,7 @@
                     <div class="w-10 h-10 bg-primary/10 rounded flex items-center justify-center p-1.5 overflow-hidden">
                         <img src="defcorp-logo.png" alt="DEF Corp" class="w-full h-full object-contain">
                     </div>
-                    <h4 class="text-xl font-bold text-white uppercase tracking-tight">DEF <span
+                    <h4 class="text-xl font-bold uppercase tracking-tight">DEF <span
                             class="text-primary italic">Portal</span></h4>
                 </div>
                 <button onclick="toggleLoginModal()" class="text-slate-500 hover:text-white transition-colors">
@@ -1848,22 +1894,22 @@
             </div>
             <form id="loginForm" class="space-y-5">
                 <div id="registerFields" class="hidden">
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Full
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Full
                         Name</label>
                     <input type="text" id="regName" placeholder="Your Name"
-                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-slate-600 text-white mb-4">
+                        class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-muted mb-4">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Email
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Email
                         Address</label>
                     <input type="email" id="authEmail" required placeholder="name@company.com"
-                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-slate-600 text-white">
+                        class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-muted">
                 </div>
                 <div>
                     <label
-                        class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Password</label>
+                        class="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Password</label>
                     <input type="password" id="authPass" required placeholder="••••••••"
-                        class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-slate-600 text-white">
+                        class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-muted">
                     <!-- Password Strength Indicator (visible only in register mode) -->
                     <div id="passwordStrength" class="hidden mt-3">
                         <div class="flex items-center justify-between mb-2">
@@ -1997,27 +2043,20 @@
             // These are client-side keys used to identify the project on Google/Firebase.
             // Security is enforced via Firebase Security Rules and API Key Restrictions.
             const PUBLIC_CONFIG = {
-                // IMPORTANT: For GitHub Pages, keys are technically public. 
-                // Ensure you have restricted these keys to your domain in Google Cloud Console.
-                GEMINI_API_KEY: 'AIzaSyDEOIc3LwFZlevYF8WU1YUGKGUIXtJIZFs',
-                FIREBASE_CONFIG: {
-                    apiKey: "AIzaSyDTN4UrGgEWESLo5_3x58pHX8obECs8Idc",
-                    authDomain: "bullet-corp-59511.firebaseapp.com",
-                    projectId: "bullet-corp-59511",
-                    storageBucket: "bullet-corp-59511.firebasestorage.app",
-                    messagingSenderId: "313077552094",
-                    appId: "1:313077552094:web:39ed6008c172d1ac4a034f",
-                    measurementId: "G-WNWPHQC1T5"
-                }
+                // IMPORTANT: For security, real keys should only be in config.js (excluded from Git).
+                GEMINI_API_KEY: '', // To be filled from config.js
+                FIREBASE_CONFIG: {} // To be filled from config.js
             };
 
             // Use CONFIG from config.js if it exists, otherwise use public defaults
             const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
 
             // --- Gemini Config ---
-            const GEMINI_API_KEY = appConfig.GEMINI_API_KEY;
-            const GEMINI_MODEL = 'gemini-1.5-flash';
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+            const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
+            const GEMINI_MODEL = 'gemini-2.5-flash';
+            // Use v1beta for newest models like 2.5-flash
+            const getApiUrl = (modelId) => `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${GEMINI_API_KEY}`;
+            const API_URL = getApiUrl(GEMINI_MODEL);
 
             const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz), a company based in Romania serving clients worldwide.
 
@@ -2279,11 +2318,6 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 return div;
             };
 
-            const MODELS = [
-                'gemini-2.5-flash',
-                'gemini-2.0-flash',
-                'gemini-1.5-flash'
-            ];
 
             const sendMessage = async () => {
                 const text = input.value.trim();
@@ -2300,33 +2334,27 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 let botResponseText = "";
                 let success = false;
 
-                // Multi-model Fallback Logic
-                for (const model of MODELS) {
-                    try {
-                        console.log(`[DEF AI] Attempting with ${model}...`);
-                        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                                contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
-                            })
-                        });
+                // Model: Gemini 2.5 Flash
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                            contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
+                        })
+                    });
 
-                        if (!response.ok) {
-                            const errData = await response.json().catch(() => ({}));
-                            console.warn(`[DEF AI] ${model} failed:`, response.status, errData);
-                            continue;
-                        }
-
+                    if (response.ok) {
                         const data = await response.json();
                         botResponseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error processing request.";
                         success = true;
-                        break;
-                    } catch (e) {
-                        console.warn(`[DEF AI] ${model} error:`, e.reason || e.message || e);
+                    } else {
+                        const errData = await response.json().catch(() => ({}));
+                        console.error(`[DEF AI] API error:`, response.status, errData);
                     }
+                } catch (e) {
+                    console.error(`[DEF AI] connection error:`, e);
                 }
 
                 typing.remove();
@@ -2336,10 +2364,9 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                         { role: 'user', parts: [{ text }] },
                         { role: 'model', parts: [{ text: botResponseText }] }
                     );
-                    if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
+                    if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
                     addMessage(botResponseText, 'bot');
                 } else {
-                    console.error('[DEF AI] All models failed.');
                     addMessage("AI temporarily unavailable. Please try again shortly or email **contact@defcorp.xyz**.", 'bot');
                 }
 
@@ -2476,6 +2503,17 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 gTimer = setInterval(() => showSlide(gIdx + 1), 6000);
             }
             if (gSlides.length > 0) resetTimer();
+
+            // --- Scroll Reveal Logic ---
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal, .stagger').forEach(el => revealObserver.observe(el));
         })();
 
         const loginModal = document.getElementById('loginModal');
