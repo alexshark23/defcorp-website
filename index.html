@@ -2296,13 +2296,30 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                             contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
                         })
                     });
+
                     if (response.ok) {
                         const data = await response.json();
                         const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Mă scuzați, a apărut o eroare.";
-                        conversationHistory.push({ role: 'user', parts: [{ text }] }, { role: 'model', parts: [{ text: botText }] });
+
+                        // Add to history
+                        conversationHistory.push({ role: 'user', parts: [{ text }] });
+                        conversationHistory.push({ role: 'model', parts: [{ text: botText }] });
+
+                        // Prune history to last 10 messages (5 rounds) to prevent token limits/errors
+                        if (conversationHistory.length > 10) {
+                            conversationHistory = conversationHistory.slice(-10);
+                        }
+
                         addMessage(botText, 'bot');
+                    } else {
+                        const errorData = await response.json().catch(() => ({}));
+                        console.error("Gemini Error:", errorData);
+                        addMessage("O eroare a apărut la procesarea mesajului. Vă rugăm să încercați din nou.", "bot");
                     }
-                } catch (e) { console.error(e); }
+                } catch (e) {
+                    console.error("Chat Error:", e);
+                    addMessage("Conexiunea cu asistentul AI a fost întreruptă.", "bot");
+                }
 
                 typing.remove();
                 isLoading = false;
