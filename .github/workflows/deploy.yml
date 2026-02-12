@@ -21,10 +21,10 @@ jobs:
 
       - name: Inject Secrets into config.js
         run: |
-          echo "const CONFIG = {" > config.js
-          echo "    GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'," >> config.js
-          echo "    FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG_JSON }}" >> config.js
-          echo "};" >> config.js
+          printf 'const CONFIG = {\n    GEMINI_API_KEY: "%s",\n    FIREBASE_CONFIG: %s\n};' "${{ secrets.GEMINI_API_KEY }}" '${{ secrets.FIREBASE_CONFIG_JSON }}' > config.js
+          echo "Debug: Verified config.js creation"
+          cat config.js | sed 's/${{ secrets.GEMINI_API_KEY }}/[REDACTED]/g' # Safe preview in logs
+
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
