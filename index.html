@@ -599,6 +599,57 @@
             scroll-behavior: smooth;
         }
 
+        /* Click Animations */
+        .click-pulse {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            transform: translate(-50%, -50%);
+            animation: clickPulseAnim 0.7s ease-out forwards;
+        }
+
+        .ripple-glow {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            filter: blur(15px);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99998;
+            opacity: 0.5;
+            transform: translate(-50%, -50%);
+            animation: clickGlowAnim 0.7s ease-out forwards;
+        }
+
+        @keyframes clickPulseAnim {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes clickGlowAnim {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(2);
+                opacity: 0;
+            }
+        }
+
         /* Form success animation */
         .form-success {
             animation: successPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2033,428 +2084,9 @@
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth-compat.js"></script>
 
-    <!-- Unified Config (Gitignored for security) -->
-    <script src="config.js"></script>
-
     <script>
-        // ===== DEF Corp Unified Engine =====
+        // ===== DEF Corp Unified UI Engine (Critical Layer) =====
         (() => {
-            // --- PUBLIC CONFIGURATION (Safe for GitHub Pages) ---
-            // These are client-side keys used to identify the project on Google/Firebase.
-            // Security is enforced via Firebase Security Rules and API Key Restrictions.
-            const PUBLIC_CONFIG = {
-                // IMPORTANT: For security, real keys should only be in config.js (excluded from Git).
-                GEMINI_API_KEY: '', // To be filled from config.js
-                FIREBASE_CONFIG: {} // To be filled from config.js
-            };
-
-            // Use CONFIG from config.js if it exists, otherwise use public defaults
-            const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
-
-            // --- Gemini Config ---
-            const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
-            const GEMINI_MODEL = 'gemini-2.5-flash';
-            // Use v1beta for newest models like 2.5-flash
-            const getApiUrl = (modelId) => `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${GEMINI_API_KEY}`;
-            const API_URL = getApiUrl(GEMINI_MODEL);
-
-            const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz), a company based in Romania serving clients worldwide.
-
-ABOUT DEF Corp:
-- We build intelligent AI chatbots, workflow automations, and cybersecurity solutions
-- Contact email: contact@defcorp.xyz | Website: defcorp.xyz
-- Response time: Within 2 hours during business days
-
-OUR SERVICES:
-1. **AI Chatbots** — 24/7 intelligent customer engagement across 50+ languages
-2. **Workflow Automation** — 5000+ integrations (Make.com, Zapier, n8n, custom APIs)
-3. **Cybersecurity** — Vulnerability assessments, penetration testing, AI-powered monitoring
-
-PRICING:
-- **Starter ($150)**: Basic AI chatbot, 1 workflow, 7 days support
-- **Professional ($300)** [BEST VALUE]: Advanced chatbot, CRM integration, 14 days support
-- **Enterprise ($600+)**: Unlimited flows, multi-platform, 30 days priority support
-
-RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 words. Use **bold** for key terms.`;
-
-            // --- State ---
-            let conversationHistory = [];
-            let isLoading = false;
-
-            // --- Chat Elements ---
-            const input = document.getElementById('chatInput');
-            const messagesDiv = document.getElementById('chatMessages');
-            const sendBtn = document.getElementById('chatSend');
-            const chatWindow = document.getElementById('chatWindow');
-            const chatFab = document.getElementById('chatFab');
-
-            // --- Firebase Auth ---
-            const firebaseConfig = appConfig.FIREBASE_CONFIG;
-            if (firebase.apps.length === 0) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            const auth = firebase.auth();
-            const googleProvider = new firebase.auth.GoogleAuthProvider();
-
-            // --- Listen for auth state changes ---
-            auth.onAuthStateChanged((user) => {
-                const landing = document.getElementById('landingPage');
-                const dashboard = document.getElementById('userDashboard');
-                if (user) {
-                    const displayName = user.displayName || user.email.split('@')[0];
-                    landing?.classList.add('hidden');
-                    dashboard?.classList.remove('hidden');
-                    chatFab?.classList.add('hidden');
-                    document.getElementById('userNameDisplay').textContent = displayName;
-                    document.getElementById('userEmailDisplay').textContent = user.email;
-                    document.getElementById('welcomeName').textContent = displayName.split(' ')[0];
-                    // Populate profile fields
-                    const profileName = document.getElementById('profileName');
-                    const profileEmail = document.getElementById('profileEmail');
-                    if (profileName) profileName.value = displayName;
-                    if (profileEmail) profileEmail.value = user.email;
-                    // Hide password change for Google-only users
-                    const isGoogleOnly = user.providerData.every(p => p.providerId === 'google.com');
-                    const passSection = document.querySelector('#currentPass')?.closest('.rounded-2xl');
-                    if (passSection && isGoogleOnly) passSection.style.display = 'none';
-                } else {
-                    landing?.classList.remove('hidden');
-                    dashboard?.classList.add('hidden');
-                    chatFab?.classList.remove('hidden');
-                }
-            });
-
-            window.logout = function () { auth.signOut().then(() => window.location.reload()); };
-
-            // --- Google Sign-In (Improved for Mobile & Redirection) ---
-            window.googleSignIn = async function () {
-                const errorDiv = document.getElementById('authError');
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-                try {
-                    if (isMobile) {
-                        await auth.signInWithRedirect(googleProvider);
-                    } else {
-                        await auth.signInWithPopup(googleProvider);
-                        toggleLoginModal();
-                    }
-                } catch (err) {
-                    if (err.code !== 'auth/popup-closed-by-user') {
-                        console.error("[Auth Error]", err);
-                        if (errorDiv) errorDiv.textContent = 'Access Denied: Authentication Error';
-                    }
-                }
-            };
-
-            // Handle Redirect Result for Mobile
-            auth.getRedirectResult().then((result) => {
-                if (result.user) toggleLoginModal();
-            }).catch((err) => {
-                console.error("[Redirect Error]", err);
-            });
-
-            // --- Forgot Password ---
-            window.forgotPassword = async function () {
-                const email = document.getElementById('authEmail').value;
-                const errorDiv = document.getElementById('authError');
-                const successDiv = document.getElementById('authSuccess');
-                if (!email) {
-                    if (errorDiv) errorDiv.textContent = 'Enter your email address first.';
-                    return;
-                }
-                try {
-                    await auth.sendPasswordResetEmail(email);
-                    if (errorDiv) errorDiv.textContent = '';
-                    if (successDiv) successDiv.textContent = 'Instructions sent to your inbox.';
-                } catch (err) {
-                    console.error("[Auth Error]", err);
-                    if (errorDiv) errorDiv.textContent = 'Access Denied: System Error';
-                }
-            };
-
-            // --- Update Profile Name ---
-            window.updateProfileName = async function () {
-                const newName = document.getElementById('profileName').value.trim();
-                const msgDiv = document.getElementById('profileMsg');
-                if (!newName) { msgDiv.textContent = 'Name cannot be empty.'; msgDiv.style.color = '#ef4444'; return; }
-                try {
-                    await auth.currentUser.updateProfile({ displayName: newName });
-                    document.getElementById('userNameDisplay').textContent = newName;
-                    document.getElementById('welcomeName').textContent = newName.split(' ')[0];
-                    msgDiv.textContent = 'Settings preserved.'; msgDiv.style.color = '#22c55e';
-                    setTimeout(() => msgDiv.textContent = '', 3000);
-                } catch (err) {
-                    console.error("[Profile Error]", err);
-                    msgDiv.textContent = 'Access Denied: Sync Error'; msgDiv.style.color = '#ef4444';
-                }
-            };
-
-            // --- Change Password ---
-            window.changePassword = async function () {
-                const currentPass = document.getElementById('currentPass').value;
-                const newPass = document.getElementById('newPass').value;
-                const msgDiv = document.getElementById('passMsg');
-                if (!currentPass || !newPass) { msgDiv.textContent = 'Fill in both fields.'; msgDiv.style.color = '#ef4444'; return; }
-                if (newPass.length < 8 || !/[A-Z]/.test(newPass) || !/[0-9]/.test(newPass) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPass)) {
-                    msgDiv.textContent = 'New password must meet strength requirements.'; msgDiv.style.color = '#ef4444'; return;
-                }
-                try {
-                    const user = auth.currentUser;
-                    const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPass);
-                    await user.reauthenticateWithCredential(cred);
-                    await user.updatePassword(newPass);
-                    msgDiv.textContent = 'Security credentials updated.'; msgDiv.style.color = '#22c55e';
-                    document.getElementById('currentPass').value = '';
-                    document.getElementById('newPass').value = '';
-                    setTimeout(() => msgDiv.textContent = '', 3000);
-                } catch (err) {
-                    console.error("[Pass Error]", err);
-                    msgDiv.textContent = 'Access Denied: Credential Mismatch'; msgDiv.style.color = '#ef4444';
-                }
-            };
-
-            // --- Password Strength Checker ---
-            const pwRules = {
-                length: (p) => p.length >= 8,
-                uppercase: (p) => /[A-Z]/.test(p),
-                number: (p) => /[0-9]/.test(p),
-                special: (p) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p)
-            };
-
-            const checkPasswordStrength = (password, suffix = '') => {
-                const passed = Object.entries(pwRules).filter(([, fn]) => fn(password)).length;
-                const pwStrength = document.getElementById(`passwordStrength${suffix}`);
-
-                // For 'Reset' we always show it, for login/register we only show it in register mode
-                const shouldShow = suffix === 'Reset' || (pwStrength && !pwStrength.classList.contains('hidden'));
-                if (!shouldShow) return passed === 4;
-
-                // Update bars
-                const colors = ['', '#ef4444', '#f59e0b', '#22c55e', '#22c55e'];
-                const labels = ['', 'Weak', 'Medium', 'Strong', 'Strong'];
-                for (let i = 1; i <= 4; i++) {
-                    const bar = document.getElementById(`pwBar${suffix}${i}`);
-                    if (bar) bar.style.backgroundColor = i <= passed ? colors[passed] : 'rgba(255,255,255,0.1)';
-                }
-                const label = document.getElementById(`pwLabel${suffix}`);
-                if (label) {
-                    label.textContent = password ? labels[passed] : '';
-                    label.style.color = colors[passed];
-                }
-
-                // Update rule icons
-                const ruleClass = suffix ? `.pw-rule-${suffix.toLowerCase()}` : '.pw-rule';
-                document.querySelectorAll(ruleClass).forEach(rule => {
-                    const ruleName = rule.dataset.rule;
-                    const icon = rule.querySelector('.material-symbols-outlined');
-                    const text = rule.querySelector('span:last-child');
-                    if (pwRules[ruleName](password)) {
-                        icon.textContent = 'check_circle';
-                        icon.style.color = '#22c55e';
-                        text.style.color = '#22c55e';
-                    } else {
-                        icon.textContent = 'circle';
-                        icon.style.color = '';
-                        text.style.color = '';
-                    }
-                });
-
-                return passed === 4;
-            };
-
-            document.getElementById('authPass')?.addEventListener('input', (e) => {
-                checkPasswordStrength(e.target.value);
-            });
-
-            document.getElementById('newPass')?.addEventListener('input', (e) => {
-                checkPasswordStrength(e.target.value, 'Reset');
-            });
-
-            window.switchAuthMode = function () {
-                const regFields = document.getElementById('registerFields');
-                const submitBtn = document.getElementById('authSubmit');
-                const switchBtn = document.getElementById('switchAuth');
-                const pwStrength = document.getElementById('passwordStrength');
-                const isReg = regFields.classList.toggle('hidden');
-                submitBtn.textContent = !isReg ? 'Create Account' : 'Sign In';
-                switchBtn.textContent = !isReg ? 'Already have an account? Sign In' : "Don't have an account? Create one";
-
-                // Show/hide password strength indicator
-                if (!isReg) {
-                    pwStrength?.classList.remove('hidden');
-                } else {
-                    pwStrength?.classList.add('hidden');
-                }
-
-                // Reset password field and error
-                document.getElementById('authPass').value = '';
-                document.getElementById('authError').textContent = '';
-                checkPasswordStrength('');
-            };
-
-            // --- Chat Logic ---
-            const addMessage = (text, sender) => {
-                const div = document.createElement('div');
-                div.className = `chat-msg ${sender}`;
-
-                if (sender === 'bot') {
-                    // Safe parsing for bot messages (only bold and line breaks)
-                    const sanitized = text
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#039;')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\n/g, '<br>');
-                    div.innerHTML = sanitized;
-                } else {
-                    // User messages are strictly plain text
-                    div.textContent = text;
-                }
-
-                messagesDiv.appendChild(div);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                return div;
-            };
-
-
-            const sendMessage = async () => {
-                const text = input.value.trim();
-                if (!text || isLoading) return;
-                addMessage(text, 'user');
-                input.value = '';
-                isLoading = true;
-                sendBtn.disabled = true;
-                const typing = document.createElement('div');
-                typing.className = 'typing-indicator';
-                typing.innerHTML = '<span></span><span></span><span></span>';
-                messagesDiv.appendChild(typing);
-
-                let botResponseText = "";
-                let success = false;
-
-                // Model: Gemini 2.5 Flash
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                            contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
-                        })
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        botResponseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error processing request.";
-                        success = true;
-                    } else {
-                        const errData = await response.json().catch(() => ({}));
-                        console.error(`[DEF AI] API error:`, response.status, errData);
-                    }
-                } catch (e) {
-                    console.error(`[DEF AI] connection error:`, e);
-                }
-
-                typing.remove();
-
-                if (success) {
-                    conversationHistory.push(
-                        { role: 'user', parts: [{ text }] },
-                        { role: 'model', parts: [{ text: botResponseText }] }
-                    );
-                    if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
-                    addMessage(botResponseText, 'bot');
-                } else {
-                    addMessage("AI temporarily unavailable. Please try again shortly or email **contact@defcorp.xyz**.", 'bot');
-                }
-
-                isLoading = false;
-                sendBtn.disabled = false;
-                input.focus();
-            };
-
-            sendBtn?.addEventListener('click', sendMessage);
-            input?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-            // --- Suggestion button handlers ---
-            document.querySelectorAll('.chat-suggestion-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const msg = btn.getAttribute('data-msg');
-                    if (msg && !isLoading) {
-                        input.value = msg;
-                        sendMessage();
-                        document.getElementById('chatSuggestions')?.remove();
-                    }
-                });
-            });
-
-            document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('authEmail').value;
-                const pass = document.getElementById('authPass').value;
-                const isReg = !document.getElementById('registerFields').classList.contains('hidden');
-                const submitBtn = document.getElementById('authSubmit');
-                const errorDiv = document.getElementById('authError');
-
-                // Block weak passwords on registration
-                if (isReg && !checkPasswordStrength(pass)) {
-                    if (errorDiv) errorDiv.textContent = 'Please meet all password requirements.';
-                    return;
-                }
-
-                submitBtn.disabled = true;
-                submitBtn.textContent = isReg ? 'Creating...' : 'Signing in...';
-                if (errorDiv) errorDiv.textContent = '';
-
-                try {
-                    if (isReg) {
-                        const name = document.getElementById('regName').value;
-                        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-                        await cred.user.updateProfile({ displayName: name });
-                    } else {
-                        await auth.signInWithEmailAndPassword(email, pass);
-                    }
-                    toggleLoginModal();
-                    // Auto-refresh to ensure dashboard state
-                    setTimeout(() => window.location.reload(), 500);
-                } catch (err) {
-                    console.error("[Auth Error]", err);
-                    let msg = 'Access Denied';
-                    if (err.code === 'auth/wrong-password') msg = 'Invalid password. Please try again.';
-                    if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
-                    if (err.code === 'auth/invalid-email') msg = 'Invalid email format.';
-                    if (err.code === 'auth/network-request-failed') msg = 'Network error. Check your connection.';
-
-                    if (errorDiv) errorDiv.textContent = msg;
-                    else alert(msg);
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = isReg ? 'Create Account' : 'Sign In';
-                }
-            });
-
-            // --- Click Animation ---
-            document.addEventListener('mousedown', (e) => {
-                const pulse = document.createElement('div');
-                pulse.className = 'click-pulse';
-                pulse.style.left = e.clientX + 'px';
-                pulse.style.top = e.clientY + 'px';
-                document.body.appendChild(pulse);
-
-                const glow = document.createElement('div');
-                glow.className = 'ripple-glow';
-                glow.style.left = e.clientX - 10 + 'px';
-                glow.style.top = e.clientY - 10 + 'px';
-                document.body.appendChild(glow);
-
-                setTimeout(() => {
-                    pulse.remove();
-                    glow.remove();
-                }, 700);
-            });
-
             // --- Dark/Light Mode ---
             window.toggleDarkMode = () => {
                 const html = document.documentElement;
@@ -2467,13 +2099,6 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
             // Init theme
             if (localStorage.getItem('theme') === 'light') toggleDarkMode();
 
-            // --- Dashboard Navigation ---
-            window.returnToSite = () => {
-                document.getElementById('userDashboard').classList.add('hidden');
-                document.getElementById('landingPage').classList.remove('hidden');
-                document.getElementById('chatFab').classList.remove('hidden');
-            };
-
             // --- Premium Gallery Logic ---
             const gSlides = document.querySelectorAll('.gallery-slide');
             const gDots = document.querySelectorAll('.gallery-dot');
@@ -2481,11 +2106,12 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
             let gTimer = null;
 
             function showSlide(n) {
+                if (gSlides.length === 0) return;
                 gSlides[gIdx].classList.remove('active');
-                gDots[gIdx].classList.remove('active');
+                if (gDots[gIdx]) gDots[gIdx].classList.remove('active');
                 gIdx = (n + gSlides.length) % gSlides.length;
                 gSlides[gIdx].classList.add('active');
-                gDots[gIdx].classList.add('active');
+                if (gDots[gIdx]) gDots[gIdx].classList.add('active');
             }
 
             window.prevNextSlide = (step) => {
@@ -2514,6 +2140,153 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
             }, { threshold: 0.1 });
 
             document.querySelectorAll('.reveal, .stagger').forEach(el => revealObserver.observe(el));
+
+            // --- Click Animation ---
+            document.addEventListener('mousedown', (e) => {
+                const pulse = document.createElement('div');
+                pulse.className = 'click-pulse';
+                pulse.style.left = e.clientX + 'px';
+                pulse.style.top = e.clientY + 'px';
+                document.body.appendChild(pulse);
+
+                const glow = document.createElement('div');
+                glow.className = 'ripple-glow';
+                glow.style.left = e.clientX + 'px';
+                glow.style.top = e.clientY + 'px';
+                document.body.appendChild(glow);
+
+                setTimeout(() => {
+                    pulse.remove();
+                    glow.remove();
+                }, 700);
+            });
+
+            // --- Dashboard Navigation ---
+            window.returnToSite = () => {
+                const dashboard = document.getElementById('userDashboard');
+                const landing = document.getElementById('landingPage');
+                const chatFab = document.getElementById('chatFab');
+                if (dashboard) dashboard.classList.add('hidden');
+                if (landing) landing.classList.remove('hidden');
+                if (chatFab) chatFab.classList.remove('hidden');
+            };
+        })();
+
+        // ===== DEF Corp Service Engine (Firebase & Gemini AI) =====
+        (() => {
+            const PUBLIC_CONFIG = { GEMINI_API_KEY: '', FIREBASE_CONFIG: {} };
+            const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
+
+            const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz). Be professional, concise and helpful.`;
+
+            let auth = null;
+            let googleProvider = null;
+            let conversationHistory = [];
+            let isLoading = false;
+
+            // Elements
+            const input = document.getElementById('chatInput');
+            const messagesDiv = document.getElementById('chatMessages');
+            const sendBtn = document.getElementById('chatSend');
+            const chatWin = document.getElementById('chatWindow');
+            const chatFab = document.getElementById('chatFab');
+
+            // --- Firebase Initialization ---
+            try {
+                if (appConfig.FIREBASE_CONFIG && appConfig.FIREBASE_CONFIG.apiKey) {
+                    if (firebase.apps.length === 0) firebase.initializeApp(appConfig.FIREBASE_CONFIG);
+                    auth = firebase.auth();
+                    googleProvider = new firebase.auth.GoogleAuthProvider();
+
+                    auth.onAuthStateChanged((user) => {
+                        const landing = document.getElementById('landingPage');
+                        const dashboard = document.getElementById('userDashboard');
+                        const chatFabBtn = document.getElementById('chatFab');
+                        if (user) {
+                            landing?.classList.add('hidden');
+                            dashboard?.classList.remove('hidden');
+                            chatFabBtn?.classList.add('hidden');
+                            document.getElementById('userNameDisplay').textContent = user.displayName || user.email.split('@')[0];
+                        } else {
+                            landing?.classList.remove('hidden');
+                            dashboard?.classList.add('hidden');
+                            chatFabBtn?.classList.remove('hidden');
+                        }
+                    });
+                }
+            } catch (e) { console.warn("[DEF Engine] Services offline:", e.message); }
+
+            // --- Auth Exports ---
+            window.logout = () => auth?.signOut().then(() => window.location.reload());
+            window.googleSignIn = async () => {
+                if (!auth) return alert("Sign-in system currently unavailable.");
+                try {
+                    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) await auth.signInWithRedirect(googleProvider);
+                    else { await auth.signInWithPopup(googleProvider); if (typeof toggleLoginModal === 'function') toggleLoginModal(); }
+                } catch (err) { console.error(err); }
+            };
+
+            // --- Chat Engine ---
+            const addMessage = (text, sender) => {
+                if (!messagesDiv) return;
+                const div = document.createElement('div');
+                div.className = `chat-msg ${sender}`;
+                if (sender === 'bot') {
+                    div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                } else {
+                    div.textContent = text;
+                }
+                messagesDiv.appendChild(div);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                return div;
+            };
+
+            const sendMessage = async () => {
+                const text = input?.value.trim();
+                if (!text || isLoading || !GEMINI_API_KEY) {
+                    if (!GEMINI_API_KEY && text) addMessage("AI Assistant is currently in maintenance mode.", "bot");
+                    return;
+                }
+                addMessage(text, 'user');
+                input.value = '';
+                isLoading = true;
+
+                const typing = document.createElement('div');
+                typing.className = 'typing-indicator';
+                typing.innerHTML = '<span></span><span></span><span></span>';
+                messagesDiv.appendChild(typing);
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                            contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Mă scuzați, a apărut o eroare.";
+                        conversationHistory.push({ role: 'user', parts: [{ text }] }, { role: 'model', parts: [{ text: botText }] });
+                        addMessage(botText, 'bot');
+                    }
+                } catch (e) { console.error(e); }
+
+                typing.remove();
+                isLoading = false;
+            };
+
+            sendBtn?.addEventListener('click', sendMessage);
+            input?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+            document.querySelectorAll('.chat-suggestion-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (input) { input.value = btn.dataset.msg; sendMessage(); }
+                });
+            });
         })();
 
         const loginModal = document.getElementById('loginModal');
