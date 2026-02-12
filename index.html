@@ -2190,7 +2190,7 @@
             const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
 
             const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
             const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz), a company based in Romania serving clients worldwide.
 
 ABOUT DEF Corp:
