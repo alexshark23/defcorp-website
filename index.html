@@ -583,72 +583,46 @@
             scroll-behavior: smooth;
         }
 
-        /* Tech Stack Scroller */
-        .tech-scroller {
+        /* Tech Stack Grid - Minimalist & Static */
+        .tech-grid {
             padding: 40px 0;
-            background: rgba(19, 200, 236, 0.02);
             border-top: 1px solid rgba(19, 200, 236, 0.05);
             border-bottom: 1px solid rgba(19, 200, 236, 0.05);
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
+            background: rgba(19, 200, 236, 0.01);
         }
 
-        .tech-scroller:before,
-        .tech-scroller:after {
-            position: absolute;
-            top: 0;
-            width: 150px;
-            height: 100%;
-            content: "";
-            z-index: 2;
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .tech-scroller:before {
-            left: 0;
-            background: linear-gradient(to right, var(--bg-dark), transparent);
-        }
-
-        .tech-scroller:after {
-            right: 0;
-            background: linear-gradient(to left, var(--bg-dark), transparent);
-        }
-
-        .tech-track {
-            display: inline-flex;
-            animation: scrollTech 30s linear infinite;
-        }
-
-        .tech-item {
+        .tech-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            opacity: 0.6;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin: 0 40px;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 13px;
-            transition: color 0.3s;
+            gap: 8px;
         }
 
-        .tech-item:hover {
+        .tech-badge:hover {
+            opacity: 1;
             color: var(--primary);
         }
 
-        .tech-item i {
-            font-size: 20px;
-            color: var(--primary);
-        }
-
-        @keyframes scrollTech {
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(-50%);
-            }
+        .tech-badge .dot {
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
         }
 
 
@@ -1340,33 +1314,18 @@
             </div>
         </section>
 
-        <!-- Tech Stack Scroller -->
-        <div class="tech-scroller reveal">
-            <div class="tech-track">
-                <!-- Group 1 -->
-                <div class="tech-item"><span class="material-icons-outlined">psychology</span> Google Gemini</div>
-                <div class="tech-item"><span class="material-icons-outlined">code</span> Python</div>
-                <div class="tech-item"><span class="material-icons-outlined">auto_fix_high</span> OpenAI</div>
-                <div class="tech-item"><span class="material-icons-outlined">terminal</span> LangChain</div>
-                <div class="tech-item"><span class="material-icons-outlined">database</span> Pinecone</div>
-                <div class="tech-item"><span class="material-icons-outlined">hub</span> n8n.io</div>
-                <div class="tech-item"><span class="material-icons-outlined">settings_suggest</span> Make.com</div>
-                <div class="tech-item"><span class="material-icons-outlined">cloud</span> Firebase</div>
-                <div class="tech-item"><span class="material-icons-outlined">bolt</span> Zapier</div>
-                <div class="tech-item"><span class="material-icons-outlined">security</span> Anthropic</div>
-                <div class="tech-item"><span class="material-icons-outlined">precision_manufacturing</span> Docker</div>
-                <!-- Duplicate for seamless loop -->
-                <div class="tech-item"><span class="material-icons-outlined">psychology</span> Google Gemini</div>
-                <div class="tech-item"><span class="material-icons-outlined">code</span> Python</div>
-                <div class="tech-item"><span class="material-icons-outlined">auto_fix_high</span> OpenAI</div>
-                <div class="tech-item"><span class="material-icons-outlined">terminal</span> LangChain</div>
-                <div class="tech-item"><span class="material-icons-outlined">database</span> Pinecone</div>
-                <div class="tech-item"><span class="material-icons-outlined">hub</span> n8n.io</div>
-                <div class="tech-item"><span class="material-icons-outlined">settings_suggest</span> Make.com</div>
-                <div class="tech-item"><span class="material-icons-outlined">cloud</span> Firebase</div>
-                <div class="tech-item"><span class="material-icons-outlined">bolt</span> Zapier</div>
-                <div class="tech-item"><span class="material-icons-outlined">security</span> Anthropic</div>
-                <div class="tech-item"><span class="material-icons-outlined">precision_manufacturing</span> Docker</div>
+        <!-- Tech Stack - Minimalist Static Version -->
+        <div class="tech-grid reveal">
+            <div class="tech-list">
+                <div class="tech-badge"><span class="dot"></span> Gemini</div>
+                <div class="tech-badge"><span class="dot"></span> Python</div>
+                <div class="tech-badge"><span class="dot"></span> OpenAI</div>
+                <div class="tech-badge"><span class="dot"></span> n8n</div>
+                <div class="tech-badge"><span class="dot"></span> Make</div>
+                <div class="tech-badge"><span class="dot"></span> Firebase</div>
+                <div class="tech-badge"><span class="dot"></span> LangChain</div>
+                <div class="tech-badge"><span class="dot"></span> Docker</div>
+                <div class="tech-badge"><span class="dot"></span> Zapier</div>
             </div>
         </div>
 
