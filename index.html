@@ -457,32 +457,7 @@
             width: 250px;
         }
 
-        /* Hero Watermark */
-        .def-watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 0;
-            filter: blur(2px);
-            animation: watermarkFloat 20s ease-in-out infinite;
-        }
 
-        @keyframes watermarkFloat {
-
-            0%,
-            100% {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-
-            50% {
-                transform: translate(-50%, -48%) rotate(5deg);
-            }
-        }
 
         /* Click ripple effect */
         .ripple {
@@ -1192,10 +1167,7 @@
             <div class="speed-line"></div>
 
             <div class="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-                <!-- Background Watermark Logo -->
-                <div class="def-watermark">
-                    <img src="defcorp-logo.png" alt="DEF Corp Watermark" class="w-full h-full object-contain">
-                </div>
+
                 <div>
                     <div
                         class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6">
