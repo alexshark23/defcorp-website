@@ -627,24 +627,96 @@
 
 
 
-        /* Form success animation */
-        .form-success {
-            animation: successPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* Command Center Stat Cards */
+        .stat-card {
+            background: rgba(16, 26, 30, 0.4);
+            border: 1px solid rgba(19, 200, 236, 0.1);
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes successPop {
-            0% {
-                transform: scale(0.95);
+        .stat-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .mini-chart {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            opacity: 0.3;
+        }
+
+        /* Terminal Style Logs */
+        .terminal-window {
+            background: #05080a;
+            border: 1px solid rgba(19, 200, 236, 0.2);
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .terminal-header {
+            background: rgba(19, 200, 236, 0.05);
+            border-bottom: 1px solid rgba(19, 200, 236, 0.1);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .log-line {
+            padding: 4px 16px;
+            font-size: 11px;
+            color: #13c8ec;
+            opacity: 0.8;
+            animation: lineFadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes lineFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 0.8;
+                transform: translateX(0);
+            }
+        }
+
+        /* Pulsing Security Shield */
+        .shield-pulse {
+            animation: shieldPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes shieldPulse {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 5px rgba(19, 200, 236, 0.4));
             }
 
             50% {
-                transform: scale(1.02);
-            }
-
-            100% {
-                transform: scale(1);
+                filter: drop-shadow(0 0 15px rgba(19, 200, 236, 0.8));
             }
         }
+
+
 
         /* Nav link hover underline */
         .nav-link {
@@ -1769,47 +1841,131 @@
             </header>
 
             <div class="grid md:grid-cols-3 gap-6 mb-12">
-                <div class="p-6 rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
-                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Active Bots</div>
-                    <div class="text-3xl font-bold text-white">04</div>
-                    <div class="text-primary text-[10px] mt-2">● SYSTEM STABLE</div>
-                </div>
-                <div class="p-6 rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
-                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">AI Inferences</div>
-                    <div class="text-3xl font-bold text-white">12,842</div>
-                    <div class="text-slate-500 text-[10px] mt-2">+12% from last month</div>
-                </div>
-                <div class="p-6 rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
-                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Security Level
+                <div class="stat-card p-6 rounded-2xl backdrop-blur-sm group">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Neural Nodes Active
                     </div>
-                    <div class="text-3xl font-bold text-white">MAX</div>
-                    <div class="text-primary text-[10px] mt-2">SHIELD ACTIVE</div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-white">04</div>
+                        <div class="text-primary text-[10px] bg-primary/10 px-2 py-0.5 rounded">ONLINE</div>
+                    </div>
+                    <div class="mini-chart">
+                        <svg class="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
+                            <path d="M0 40 L0 30 L20 35 L40 25 L60 30 L80 15 L100 20 L100 40 Z" fill="url(#grad1)" />
+                            <defs>
+                                <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:var(--primary);stop-opacity:0.2" />
+                                    <stop offset="100%" style="stop-color:var(--primary);stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-card p-6 rounded-2xl backdrop-blur-sm">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">AI Inferences (24h)
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-white">12,842</div>
+                        <div class="text-green-400 text-[10px]">+14.2% ↑</div>
+                    </div>
+                    <div class="mini-chart">
+                        <svg class="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
+                            <path d="M0 40 L0 35 L20 30 L40 38 L60 25 L80 20 L100 15 L100 40 Z" fill="url(#grad2)" />
+                            <defs>
+                                <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#4ade80;stop-opacity:0.1" />
+                                    <stop offset="100%" style="stop-color:#4ade80;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-card p-6 rounded-2xl backdrop-blur-sm">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Security Protocol
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-3xl font-bold text-white uppercase italic">Ultra</div>
+                        <span class="material-symbols-outlined text-primary text-2xl shield-pulse">verified_user</span>
+                    </div>
+                    <div class="text-primary text-[10px] mt-2 tracking-[0.2em] font-bold">DEF-SHIELD OPS: ACTIVE</div>
                 </div>
             </div>
 
-            <section>
-                <h2 class="text-xl font-bold mb-6 uppercase tracking-tight">Active Services</h2>
-                <div class="space-y-4">
-                    <div class="p-5 rounded-xl border border-primary/10 bg-card-bg flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <span class="material-icons-outlined text-primary">smart_toy</span>
+            <div class="grid lg:grid-cols-3 gap-8 mb-12">
+                <!-- Services Column -->
+                <div class="lg:col-span-2 space-y-6">
+                    <h2 class="text-xl font-bold uppercase tracking-tight flex items-center gap-3">
+                        <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                        Deployed Assets
+                    </h2>
+                    <div class="space-y-4">
+                        <div
+                            class="p-6 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all flex items-center justify-between group">
+                            <div class="flex items-center gap-5">
+                                <div
+                                    class="w-14 h-14 bg-primary/5 rounded-xl flex items-center justify-center border border-primary/10 group-hover:border-primary/30 transition-all">
+                                    <span class="material-icons-outlined text-primary text-2xl">terminal</span>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-lg">Main Assistant V3.0</div>
+                                    <div class="text-slate-500 text-xs flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                        Uptime: 99.9% | Latency: 24ms
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <div class="font-bold">Enterprise Chatbot V2</div>
-                                <div class="text-muted text-xs">Live on primary domain</div>
-                            </div>
+                            <button
+                                class="px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg text-primary text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-slate-900 transition-all">
+                                Access Core
+                            </button>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span
-                                class="text-[10px] text-primary font-bold uppercase tracking-widest mr-2">Online</span>
-                            <button class="w-10 h-6 bg-primary rounded-full relative">
-                                <div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+
+                        <div
+                            class="p-6 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all flex items-center justify-between group">
+                            <div class="flex items-center gap-5">
+                                <div
+                                    class="w-14 h-14 bg-slate-500/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:border-white/20 transition-all">
+                                    <span class="material-icons-outlined text-slate-500 text-2xl">lock</span>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-lg text-slate-300">Intrusion Detection System</div>
+                                    <div class="text-slate-600 text-xs uppercase tracking-widest">Awaiting Client Config
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-slate-500 text-[10px] font-bold uppercase tracking-widest cursor-not-allowed">
+                                Setup
                             </button>
                         </div>
                     </div>
                 </div>
-            </section>
+
+                <!-- Logs Column -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-bold uppercase tracking-tight flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">analytics</span>
+                        System Logs
+                    </h2>
+                    <div class="terminal-window h-[320px] flex flex-col">
+                        <div class="terminal-header">
+                            <div class="terminal-dot bg-red-500/50"></div>
+                            <div class="terminal-dot bg-yellow-500/50"></div>
+                            <div class="terminal-dot bg-green-500/50"></div>
+                            <span
+                                class="ml-2 text-[10px] text-slate-500 uppercase tracking-widest">defbox_kernel_v2.0</span>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-2" id="terminalLogs">
+                            <div class="log-line">[03:15:22] INITIALIZING_CORE... OK</div>
+                            <div class="log-line">[03:15:24] MEMORY_CHECK: 128GB... OK</div>
+                            <div class="log-line">[03:15:25] AI_ENGINE_SYNC: GEMINI_FLASH... OK</div>
+                            <div class="log-line">[03:16:01] INCOMING_REQUEST: 192.168.1.1</div>
+                            <div class="log-line">[03:16:02] PARSING_CONTEXT... DONE</div>
+                            <div class="log-line text-green-400/80">[03:16:05] RESPONSE_GEN: 1.2s</div>
+                            <div class="log-line">[03:17:42] LOG_STREAM_DAEMON: LISTENING</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- User Profile Section -->
             <section class="mt-12">
@@ -2124,6 +2280,31 @@
                 if (landing) landing.classList.remove('hidden');
                 if (chatFab) chatFab.classList.remove('hidden');
             };
+
+            // --- Live Terminal Logs ---
+            const logsContainer = document.getElementById('terminalLogs');
+            const logEntries = [
+                "SECURITY_SCAN: NO THREATS FOUND",
+                "SYNCING_NEURAL_NETWORK... 100%",
+                "OPTIMIZING_WORKFLOW_NODES... DONE",
+                "ENCRYPTING_DATA_STREAM... OK",
+                "IP_FILTER_ACTIVE: 42 BLOCKED",
+                "GEMINI_API_HEARTBEAT: STABLE",
+                "PORTAL_ACCESS_VERIFIED: CLIENT_ROOT"
+            ];
+
+            function addLiveLog() {
+                if (!logsContainer || document.getElementById('userDashboard').classList.contains('hidden')) return;
+                const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+                const entry = logEntries[Math.floor(Math.random() * logEntries.length)];
+                const div = document.createElement('div');
+                div.className = 'log-line';
+                div.textContent = `[${time}] ${entry}`;
+                logsContainer.appendChild(div);
+                logsContainer.scrollTop = logsContainer.scrollHeight;
+                if (logsContainer.children.length > 20) logsContainer.removeChild(logsContainer.children[0]);
+            }
+            setInterval(addLiveLog, 4000);
         })();
 
         // ===== DEF Corp Service Engine (Firebase & Gemini AI) =====
