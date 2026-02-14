@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 config.js
+*.checkpoint
 # Firebase keys / config
 firebase-credentials.json
 google-services.json

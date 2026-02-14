@@ -2389,6 +2389,168 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
             // --- Auth Exports ---
             window.logout = () => auth?.signOut().then(() => window.location.reload());
 
+            let isRegisterMode = false;
+            window.switchAuthMode = () => {
+                isRegisterMode = !isRegisterMode;
+                const regFields = document.getElementById('registerFields');
+                const authSubmit = document.getElementById('authSubmit');
+                const switchAuth = document.getElementById('switchAuth');
+                const forgotPassWrap = document.getElementById('forgotPassWrap');
+                const passwordStrength = document.getElementById('passwordStrength');
+
+                if (isRegisterMode) {
+                    regFields?.classList.remove('hidden');
+                    passwordStrength?.classList.remove('hidden');
+                    forgotPassWrap?.classList.add('hidden');
+                    authSubmit.textContent = 'Create Account';
+                    switchAuth.textContent = 'Already have an account? Sign In';
+                } else {
+                    regFields?.classList.add('hidden');
+                    passwordStrength?.classList.add('hidden');
+                    forgotPassWrap?.classList.remove('hidden');
+                    authSubmit.textContent = 'Sign In';
+                    switchAuth.textContent = "Don't have an account? Create one";
+                }
+            };
+
+            const validatePassword = (pass) => {
+                const rules = {
+                    length: pass.length >= 8,
+                    uppercase: /[A-Z]/.test(pass),
+                    number: /[0-9]/.test(pass),
+                    special: /[^A-Za-z0-9]/.test(pass)
+                };
+                let strength = 0;
+                Object.keys(rules).forEach(rule => {
+                    const el = document.querySelector(`.pw-rule[data-rule="${rule}"]`);
+                    const elReset = document.querySelector(`.pw-rule-reset[data-rule="${rule}"]`);
+                    if (rules[rule]) {
+                        strength++;
+                        el?.querySelector('span')?.classList.replace('text-slate-600', 'text-green-400');
+                        el?.querySelector('span')?.textContent = 'check_circle';
+                        elReset?.querySelector('span')?.classList.replace('text-slate-600', 'text-green-400');
+                        elReset?.querySelector('span')?.textContent = 'check_circle';
+                    } else {
+                        el?.querySelector('span')?.classList.replace('text-green-400', 'text-slate-600');
+                        el?.querySelector('span')?.textContent = 'circle';
+                        elReset?.querySelector('span')?.classList.replace('text-green-400', 'text-slate-600');
+                        elReset?.querySelector('span')?.textContent = 'circle';
+                    }
+                });
+
+                const bars = [document.getElementById('pwBar1'), document.getElementById('pwBar2'), document.getElementById('pwBar3'), document.getElementById('pwBar4')];
+                const barsReset = [document.getElementById('pwBarReset1'), document.getElementById('pwBarReset2'), document.getElementById('pwBarReset3'), document.getElementById('pwBarReset4')];
+                const labels = ["Weak", "Fair", "Good", "Strong"];
+                const colors = ["bg-red-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"];
+
+                bars.forEach((bar, i) => {
+                    bar?.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-white/10');
+                    if (i < strength) bar?.classList.add(colors[strength - 1]);
+                    else bar?.classList.add('bg-white/10');
+                });
+                barsReset.forEach((bar, i) => {
+                    bar?.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-white/10');
+                    if (i < strength) bar?.classList.add(colors[strength - 1]);
+                    else bar?.classList.add('bg-white/10');
+                });
+
+                const label = document.getElementById('pwLabel');
+                const labelReset = document.getElementById('pwLabelReset');
+                if (label) label.textContent = strength > 0 ? labels[strength - 1] : "";
+                if (labelReset) labelReset.textContent = strength > 0 ? labels[strength - 1] : "";
+
+                return strength === 4;
+            };
+
+            document.getElementById('authPass')?.addEventListener('input', (e) => validatePassword(e.target.value));
+            document.getElementById('newPass')?.addEventListener('input', (e) => validatePassword(e.target.value));
+
+            document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('authEmail').value;
+                const pass = document.getElementById('authPass').value;
+                const errEl = document.getElementById('authError');
+                const submitBtn = document.getElementById('authSubmit');
+
+                errEl.textContent = "";
+                submitBtn.disabled = true;
+                const originalText = submitBtn.textContent;
+                submitBtn.innerHTML = '<span class="animate-spin material-icons-outlined text-sm">autorenew</span> Processing...';
+
+                try {
+                    if (isRegisterMode) {
+                        if (!validatePassword(pass)) throw new Error("Password does not meet requirements.");
+                        const name = document.getElementById('regName').value;
+                        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                        await cred.user.updateProfile({ displayName: name });
+                        document.getElementById('authSuccess').textContent = "Account created successfully!";
+                    } else {
+                        await auth.signInWithEmailAndPassword(email, pass);
+                    }
+                    toggleLoginModal();
+                } catch (err) {
+                    errEl.textContent = err.message;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            });
+
+            window.forgotPassword = async () => {
+                const email = document.getElementById('authEmail').value;
+                if (!email) {
+                    document.getElementById('authError').textContent = "Please enter your email first.";
+                    return;
+                }
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    document.getElementById('authSuccess').textContent = "Password reset email sent!";
+                } catch (err) {
+                    document.getElementById('authError').textContent = err.message;
+                }
+            };
+
+            window.updateProfileName = async () => {
+                const newName = document.getElementById('profileName').value;
+                const msgEl = document.getElementById('profileMsg');
+                try {
+                    await auth.currentUser.updateProfile({ displayName: newName });
+                    document.getElementById('userNameDisplay').textContent = newName;
+                    document.getElementById('welcomeName').textContent = newName;
+                    msgEl.className = "text-xs text-center mt-1 text-green-400";
+                    msgEl.textContent = "Profile updated!";
+                } catch (err) {
+                    msgEl.className = "text-xs text-center mt-1 text-red-400";
+                    msgEl.textContent = err.message;
+                }
+            };
+
+            window.changePassword = async () => {
+                const currentPass = document.getElementById('currentPass').value;
+                const newPass = document.getElementById('newPass').value;
+                const msgEl = document.getElementById('passMsg');
+
+                if (!validatePassword(newPass)) {
+                    msgEl.className = "text-xs text-center mt-1 text-red-400";
+                    msgEl.textContent = "New password is not strong enough.";
+                    return;
+                }
+
+                try {
+                    const user = auth.currentUser;
+                    const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPass);
+                    await user.reauthenticateWithCredential(cred);
+                    await user.updatePassword(newPass);
+                    msgEl.className = "text-xs text-center mt-1 text-green-400";
+                    msgEl.textContent = "Password updated!";
+                    document.getElementById('currentPass').value = "";
+                    document.getElementById('newPass').value = "";
+                } catch (err) {
+                    msgEl.className = "text-xs text-center mt-1 text-red-400";
+                    msgEl.textContent = err.message;
+                }
+            };
+
             // --- Chat Engine ---
             const addMessage = (text, sender) => {
                 if (!messagesDiv) return;
