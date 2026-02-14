@@ -136,6 +136,10 @@
             color: var(--text-muted) !important;
         }
 
+        .text-muted-semantic {
+            color: var(--text-muted) !important;
+        }
+
         /* Essential Theme Overrides */
         .light-mode h1,
         .light-mode h2,
@@ -2164,15 +2168,15 @@
                     class="btn-press ripple w-full py-4 bg-primary text-background-dark font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider">
                     Sign In
                 </button>
-                <div class="flex items-center gap-2 text-center my-3 text-[11px] text-slate-500" id="forgotPassWrap">
+                <div class="flex items-center gap-2 text-center my-3 text-[11px]" id="forgotPassWrap">
                     <a href="javascript:void(0)" onclick="forgotPassword()"
-                        class="text-slate-500 hover:text-primary transition-colors">
+                        class="text-muted-semantic hover:text-primary transition-colors">
                         Forgot password?
                     </a>
                 </div>
                 <div class="text-center">
                     <a href="javascript:void(0)" id="switchAuth" onclick="switchAuthMode()"
-                        class="text-[11px] text-slate-500 hover:text-primary transition-colors">
+                        class="text-[11px] text-muted-semantic hover:text-primary transition-colors">
                         Don't have an account? Create one
                     </a>
                 </div>
@@ -2470,9 +2474,11 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
                 const email = document.getElementById('authEmail').value;
                 const pass = document.getElementById('authPass').value;
                 const errEl = document.getElementById('authError');
+                const successEl = document.getElementById('authSuccess');
                 const submitBtn = document.getElementById('authSubmit');
 
                 errEl.textContent = "";
+                successEl.textContent = "";
                 submitBtn.disabled = true;
                 const originalText = submitBtn.textContent;
                 submitBtn.innerHTML = '<span class="animate-spin material-icons-outlined text-sm">autorenew</span> Processing...';
@@ -2497,16 +2503,22 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
             });
 
             window.forgotPassword = async () => {
+                if (!auth) {
+                    document.getElementById('authError').textContent = "Authentication service is unavailable.";
+                    return;
+                }
                 const email = document.getElementById('authEmail').value;
                 if (!email) {
-                    document.getElementById('authError').textContent = "Please enter your email first.";
+                    document.getElementById('authError').textContent = "Please enter your email address first.";
                     return;
                 }
                 try {
                     await auth.sendPasswordResetEmail(email);
-                    document.getElementById('authSuccess').textContent = "Password reset email sent!";
+                    document.getElementById('authSuccess').textContent = "Password reset email sent! Check your inbox.";
+                    document.getElementById('authError').textContent = "";
                 } catch (err) {
                     document.getElementById('authError').textContent = err.message;
+                    document.getElementById('authSuccess').textContent = "";
                 }
             };
 
