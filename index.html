@@ -13,7 +13,6 @@
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self' https: 'unsafe-inline'; img-src 'self' data: https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval';">
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
@@ -2333,6 +2332,8 @@
         (() => {
             const PUBLIC_CONFIG = { GEMINI_API_KEY: '', FIREBASE_CONFIG: {} };
             const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
+            // Alias for potential library requirements
+            window.firebaseConfig = appConfig.FIREBASE_CONFIG;
 
             const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
             const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
@@ -2642,10 +2643,11 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
         })();
 
         const loginModal = document.getElementById('loginModal');
-        function toggleLoginModal() {
+        window.toggleLoginModal = function () {
+            if (!loginModal) return;
             loginModal.classList.toggle('active');
             document.body.style.overflow = loginModal.classList.contains('active') ? 'hidden' : '';
-        }
+        };
 
         // --- Chat Window Toggle (uses CSS class 'visible' and FAB class 'open') ---
         let isChatOpen = false;
@@ -2653,15 +2655,15 @@ RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 w
         const chatWin = document.getElementById('chatWindow');
         const fabIconEl = document.getElementById('fabIcon');
 
-        function toggleChat() {
+        window.toggleChat = function () {
             isChatOpen = !isChatOpen;
-            chatWin.classList.toggle('visible', isChatOpen);
-            chatFabBtn.classList.toggle('open', isChatOpen);
-            fabIconEl.textContent = isChatOpen ? 'close' : 'chat';
+            if (chatWin) chatWin.classList.toggle('visible', isChatOpen);
+            if (chatFabBtn) chatFabBtn.classList.toggle('open', isChatOpen);
+            if (fabIconEl) fabIconEl.textContent = isChatOpen ? 'close' : 'chat';
             if (isChatOpen) {
                 setTimeout(() => document.getElementById('chatInput')?.focus(), 350);
             }
-        }
+        };
 
         chatFabBtn.addEventListener('click', toggleChat);
         document.getElementById('chatClose').addEventListener('click', toggleChat);
