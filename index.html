@@ -64,8 +64,8 @@
             --card-bg: #ffffff;
             --modal-bg: #ffffff;
             --text-main: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
+            --text-secondary: #334155;
+            --text-muted: #475569;
             --border-color: rgba(0, 0, 0, 0.1);
             --input-bg: #f1f5f9;
             --input-border: rgba(0, 0, 0, 0.15);
@@ -1723,105 +1723,6 @@
             </div>
         </footer>
 
-        <script>
-            // ===== Smooth scroll =====
-            document.querySelectorAll('a[href^="#"]').forEach(a => {
-                a.addEventListener('click', e => {
-                    e.preventDefault();
-                    const t = document.querySelector(a.getAttribute('href'));
-                    if (t) t.scrollIntoView({ behavior: 'smooth' });
-                    // Close mobile menu
-                    document.getElementById('mobileMenu')?.classList.remove('open');
-                });
-            });
-
-            // ===== Mobile menu =====
-            document.getElementById('mobileBtn')?.addEventListener('click', () => {
-                document.getElementById('mobileMenu').classList.toggle('open');
-            });
-
-            // ===== Ripple click effect =====
-            document.querySelectorAll('.ripple').forEach(el => {
-                el.addEventListener('click', function (e) {
-                    const rect = this.getBoundingClientRect();
-                    this.style.setProperty('--x', (e.clientX - rect.left) + 'px');
-                    this.style.setProperty('--y', (e.clientY - rect.top) + 'px');
-                    this.classList.remove('clicked');
-                    void this.offsetWidth; // force reflow
-                    this.classList.add('clicked');
-                    setTimeout(() => this.classList.remove('clicked'), 600);
-                });
-            });
-
-            // ===== Scroll reveal animations =====
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-
-            document.querySelectorAll('.reveal, .stagger').forEach(el => observer.observe(el));
-
-            // ===== Contact form — sends real email via mailto + copies to clipboard =====
-            const form = document.getElementById('contactForm');
-            const formWrapper = document.getElementById('formWrapper');
-            const submitBtn = document.getElementById('submitBtn');
-
-            form?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const data = Object.fromEntries(new FormData(form));
-
-                // Disable button
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="animate-spin material-icons-outlined text-sm">autorenew</span> Sending...';
-
-                // Build mailto link
-                const subject = encodeURIComponent(`[DEF Corp] ${data.service} - ${data.name}`);
-                const body = encodeURIComponent(
-                    `Name: ${data.name}\nEmail: ${data.email}\nService: ${data.service}\n\nMessage:\n${data.message}`
-                );
-
-                // Short delay for UX feel
-                await new Promise(r => setTimeout(r, 800));
-
-                // Open mailto
-                window.location.href = `mailto:contact@defcorp.xyz?subject=${subject}&body=${body}`;
-
-                // Copy to clipboard (as fallback for mailto)
-                try {
-                    const plainBody = `Name: ${data.name}\nEmail: ${data.email}\nService: ${data.service}\n\nMessage:\n${data.message}`;
-                    await navigator.clipboard.writeText(plainBody);
-                    console.log("[Contact] Message copied to clipboard as fallback.");
-                } catch (err) {
-                    console.warn("[Contact] Clipboard access denied.");
-                }
-
-                // Show success
-                form.classList.add('hidden');
-                document.getElementById('formSuccess').classList.remove('hidden');
-                formWrapper.classList.add('form-success');
-            });
-
-            function resetForm() {
-                form.reset();
-                form.classList.remove('hidden');
-                document.getElementById('formSuccess').classList.add('hidden');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Send Message <span class="material-icons-outlined text-sm">send</span>';
-            }
-
-            // ===== Nav background on scroll =====
-            window.addEventListener('scroll', () => {
-                const nav = document.querySelector('nav');
-                if (window.scrollY > 50) {
-                    nav.style.borderBottomColor = 'rgba(19, 200, 236, 0.15)';
-                } else {
-                    nav.style.borderBottomColor = 'rgba(19, 200, 236, 0.08)';
-                }
-            });
-        </script>
     </div> <!-- End Landing Page -->
 
     <!-- ===== Client Dashboard (Hidden by default) ===== -->
@@ -2181,6 +2082,29 @@
                 </div>
             </form>
 
+            <!-- Divider -->
+            <div class="flex items-center gap-3 my-4">
+                <div class="flex-1 h-px bg-white/10"></div>
+                <span class="text-[10px] text-slate-500 uppercase tracking-widest">or</span>
+                <div class="flex-1 h-px bg-white/10"></div>
+            </div>
+
+            <!-- Google Sign-In Button -->
+            <button onclick="googleSignIn()" id="googleSignInBtn"
+                class="btn-press w-full py-3.5 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all flex items-center justify-center gap-3 text-sm font-medium text-white">
+                <svg width="18" height="18" viewBox="0 0 48 48">
+                    <path fill="#EA4335"
+                        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                    <path fill="#4285F4"
+                        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                    <path fill="#FBBC05"
+                        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                    <path fill="#34A853"
+                        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                </svg>
+                Continue with Google
+            </button>
+
             <p id="authError" class="text-red-400 text-xs text-center mt-3"></p>
             <p id="authSuccess" class="text-green-400 text-xs text-center mt-2"></p>
         </div>
@@ -2234,442 +2158,217 @@
     <script src="config.js"></script>
 
     <script>
-        // ===== DEF Corp Unified UI Engine (Critical Layer) =====
-        (() => {
-            // --- Dark/Light Mode ---
-            window.toggleDarkMode = () => {
-                const html = document.documentElement;
-                const isLight = html.classList.toggle('light-mode');
-                const icon = document.querySelector('.theme-icon');
-                if (icon) icon.textContent = isLight ? 'dark_mode' : 'light_mode';
-                localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            };
+            // Use a single, unified scope to avoid isolation issues
+            (() => {
+                // ===== 1. CORE CONFIGURATION =====
+                const PUBLIC_CONFIG = { GEMINI_API_KEY: '', FIREBASE_CONFIG: {} };
+                const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
+                const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
+                const GEMINI_MODEL = 'gemini-2.5-flash';
+                const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+                const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz). You were developed by Alexandru Glonț and his team in Romania. 
+            RULES: Be professional, helpful, concise. Recommend Standard/Professional plan. Under 200 words.`;
 
-            // Init theme
-            if (localStorage.getItem('theme') === 'light') toggleDarkMode();
-
-            // --- Premium Gallery Logic ---
-            const gSlides = document.querySelectorAll('.gallery-slide');
-            const gDots = document.querySelectorAll('.gallery-dot');
-            let gIdx = 0;
-            let gTimer = null;
-
-            function showSlide(n) {
-                if (gSlides.length === 0) return;
-                gSlides[gIdx].classList.remove('active');
-                if (gDots[gIdx]) gDots[gIdx].classList.remove('active');
-                gIdx = (n + gSlides.length) % gSlides.length;
-                gSlides[gIdx].classList.add('active');
-                if (gDots[gIdx]) gDots[gIdx].classList.add('active');
-            }
-
-            window.prevNextSlide = (step) => {
-                resetTimer();
-                showSlide(gIdx + step);
-            };
-
-            window.jumpToSlide = (n) => {
-                resetTimer();
-                showSlide(n);
-            };
-
-            function resetTimer() {
-                clearInterval(gTimer);
-                gTimer = setInterval(() => showSlide(gIdx + 1), 6000);
-            }
-            if (gSlides.length > 0) resetTimer();
-
-            // --- Scroll Reveal Logic ---
-            const revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('.reveal, .stagger').forEach(el => revealObserver.observe(el));
-
-
-
-            // --- Dashboard Navigation ---
-            window.returnToSite = () => {
-                const dashboard = document.getElementById('userDashboard');
-                const landing = document.getElementById('landingPage');
-                const chatFab = document.getElementById('chatFab');
-                if (dashboard) dashboard.classList.add('hidden');
-                if (landing) landing.classList.remove('hidden');
-                if (chatFab) chatFab.classList.remove('hidden');
-            };
-
-            // --- Live Terminal Logs ---
-            const logsContainer = document.getElementById('terminalLogs');
-            const logEntries = [
-                "SECURITY_SCAN: NO THREATS FOUND",
-                "SYNCING_NEURAL_NETWORK... 100%",
-                "OPTIMIZING_WORKFLOW_NODES... DONE",
-                "ENCRYPTING_DATA_STREAM... OK",
-                "IP_FILTER_ACTIVE: 42 BLOCKED",
-                "GEMINI_API_HEARTBEAT: STABLE",
-                "PORTAL_ACCESS_VERIFIED: CLIENT_ROOT"
-            ];
-
-            function addLiveLog() {
-                if (!logsContainer || document.getElementById('userDashboard').classList.contains('hidden')) return;
-                const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
-                const entry = logEntries[Math.floor(Math.random() * logEntries.length)];
-                const div = document.createElement('div');
-                div.className = 'log-line';
-                div.textContent = `[${time}] ${entry}`;
-                logsContainer.appendChild(div);
-                logsContainer.scrollTop = logsContainer.scrollHeight;
-                if (logsContainer.children.length > 20) logsContainer.removeChild(logsContainer.children[0]);
-            }
-            setInterval(addLiveLog, 4000);
-        })();
-
-        // ===== DEF Corp Service Engine (Firebase & Gemini AI) =====
-        (() => {
-            const PUBLIC_CONFIG = { GEMINI_API_KEY: '', FIREBASE_CONFIG: {} };
-            const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
-            // Alias for potential library requirements
-            window.firebaseConfig = appConfig.FIREBASE_CONFIG;
-
-            const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
-            const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz), a company based in Romania serving clients worldwide.
-
-ABOUT DEF Corp:
-- We build intelligent AI chatbots, workflow automations, and cybersecurity solutions
-- Contact email: contact@defcorp.xyz | Website: defcorp.xyz
-- Response time: Within 2 hours during business days
-
-OUR SERVICES:
-1. **AI Chatbots** — 24/7 intelligent customer engagement across 50+ languages
-2. **Workflow Automation** — 5000+ integrations (Make.com, Zapier, n8n, custom APIs)
-3. **Cybersecurity** — Vulnerability assessments, penetration testing, AI-powered monitoring
-
-PRICING:
-- **Starter ($150)**: Basic AI chatbot, 1 workflow, 7 days support
-- **Professional ($300)** [BEST VALUE]: Advanced chatbot, CRM integration, 14 days support
-- **Enterprise ($600+)**: Unlimited flows, multi-platform, 30 days priority support
-
-RULES: Be friendly & concise. Recommend Professional. Keep responses under 150 words. Use **bold** for key terms.`;
-
-            let auth = null;
-            let conversationHistory = [];
-            let isLoading = false;
-
-            // Elements
-            const input = document.getElementById('chatInput');
-            const messagesDiv = document.getElementById('chatMessages');
-            const sendBtn = document.getElementById('chatSend');
-            const chatWin = document.getElementById('chatWindow');
-            const chatFab = document.getElementById('chatFab');
-
-            // --- Firebase Initialization ---
-            try {
-                if (appConfig.FIREBASE_CONFIG && appConfig.FIREBASE_CONFIG.apiKey) {
-                    if (firebase.apps.length === 0) firebase.initializeApp(appConfig.FIREBASE_CONFIG);
-                    auth = firebase.auth();
-
-                    auth.onAuthStateChanged((user) => {
-                        const landing = document.getElementById('landingPage');
-                        const dashboard = document.getElementById('userDashboard');
-                        const chatFabBtn = document.getElementById('chatFab');
-                        if (user) {
-                            landing?.classList.add('hidden');
-                            dashboard?.classList.remove('hidden');
-                            chatFabBtn?.classList.add('hidden');
-                            document.getElementById('userNameDisplay').textContent = user.displayName || user.email.split('@')[0];
-                        } else {
-                            landing?.classList.remove('hidden');
-                            dashboard?.classList.add('hidden');
-                            chatFabBtn?.classList.remove('hidden');
-                        }
-                    });
-                }
-            } catch (e) { console.warn("[DEF Engine] Services offline:", e.message); }
-
-            // --- Auth Exports ---
-            window.logout = () => auth?.signOut().then(() => window.location.reload());
-
-            let isRegisterMode = false;
-            window.switchAuthMode = () => {
-                isRegisterMode = !isRegisterMode;
-                const regFields = document.getElementById('registerFields');
-                const authSubmit = document.getElementById('authSubmit');
-                const switchAuth = document.getElementById('switchAuth');
-                const forgotPassWrap = document.getElementById('forgotPassWrap');
-                const passwordStrength = document.getElementById('passwordStrength');
-
-                if (isRegisterMode) {
-                    regFields?.classList.remove('hidden');
-                    passwordStrength?.classList.remove('hidden');
-                    forgotPassWrap?.classList.add('hidden');
-                    authSubmit.textContent = 'Create Account';
-                    switchAuth.textContent = 'Already have an account? Sign In';
-                } else {
-                    regFields?.classList.add('hidden');
-                    passwordStrength?.classList.add('hidden');
-                    forgotPassWrap?.classList.remove('hidden');
-                    authSubmit.textContent = 'Sign In';
-                    switchAuth.textContent = "Don't have an account? Create one";
-                }
-            };
-
-            const validatePassword = (pass) => {
-                const rules = {
-                    length: pass.length >= 8,
-                    uppercase: /[A-Z]/.test(pass),
-                    number: /[0-9]/.test(pass),
-                    special: /[^A-Za-z0-9]/.test(pass)
+                // ===== 2. GLOBAL HANDLERS (available from HTML onclick) =====
+                window.toggleDarkMode = () => {
+                    const isLight = document.documentElement.classList.toggle('light-mode');
+                    const icon = document.querySelector('.theme-icon');
+                    if (icon) icon.textContent = isLight ? 'dark_mode' : 'light_mode';
+                    localStorage.setItem('theme', isLight ? 'light' : 'dark');
                 };
-                let strength = 0;
-                Object.keys(rules).forEach(rule => {
-                    const el = document.querySelector(`.pw-rule[data-rule="${rule}"]`);
-                    const elReset = document.querySelector(`.pw-rule-reset[data-rule="${rule}"]`);
-                    if (rules[rule]) {
-                        strength++;
-                        el?.querySelector('span')?.classList.replace('text-slate-600', 'text-green-400');
-                        el?.querySelector('span')?.textContent = 'check_circle';
-                        elReset?.querySelector('span')?.classList.replace('text-slate-600', 'text-green-400');
-                        elReset?.querySelector('span')?.textContent = 'check_circle';
-                    } else {
-                        el?.querySelector('span')?.classList.replace('text-green-400', 'text-slate-600');
-                        el?.querySelector('span')?.textContent = 'circle';
-                        elReset?.querySelector('span')?.classList.replace('text-green-400', 'text-slate-600');
-                        elReset?.querySelector('span')?.textContent = 'circle';
+
+                window.toggleLoginModal = () => {
+                    const modal = document.getElementById('loginModal');
+                    if (modal) {
+                        modal.classList.toggle('active');
+                        document.body.style.overflow = modal.classList.contains('active') ? 'hidden' : '';
                     }
-                });
+                };
 
-                const bars = [document.getElementById('pwBar1'), document.getElementById('pwBar2'), document.getElementById('pwBar3'), document.getElementById('pwBar4')];
-                const barsReset = [document.getElementById('pwBarReset1'), document.getElementById('pwBarReset2'), document.getElementById('pwBarReset3'), document.getElementById('pwBarReset4')];
-                const labels = ["Weak", "Fair", "Good", "Strong"];
-                const colors = ["bg-red-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"];
+                window.toggleChat = () => {
+                    const chatWin = document.getElementById('chatWindow');
+                    const chatFab = document.getElementById('chatFab');
+                    const fabIcon = document.getElementById('fabIcon');
+                    const isOpen = chatWin?.classList.toggle('visible');
+                    chatFab?.classList.toggle('open', isOpen);
+                    if (fabIcon) fabIcon.textContent = isOpen ? 'close' : 'chat';
+                    if (isOpen) setTimeout(() => document.getElementById('chatInput')?.focus(), 350);
+                };
 
-                bars.forEach((bar, i) => {
-                    bar?.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-white/10');
-                    if (i < strength) bar?.classList.add(colors[strength - 1]);
-                    else bar?.classList.add('bg-white/10');
-                });
-                barsReset.forEach((bar, i) => {
-                    bar?.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-white/10');
-                    if (i < strength) bar?.classList.add(colors[strength - 1]);
-                    else bar?.classList.add('bg-white/10');
-                });
+                window.returnToSite = () => {
+                    document.getElementById('userDashboard')?.classList.add('hidden');
+                    document.getElementById('landingPage')?.classList.remove('hidden');
+                    document.getElementById('chatFab')?.classList.remove('hidden');
+                };
 
-                const label = document.getElementById('pwLabel');
-                const labelReset = document.getElementById('pwLabelReset');
-                if (label) label.textContent = strength > 0 ? labels[strength - 1] : "";
-                if (labelReset) labelReset.textContent = strength > 0 ? labels[strength - 1] : "";
-
-                return strength === 4;
-            };
-
-            document.getElementById('authPass')?.addEventListener('input', (e) => validatePassword(e.target.value));
-            document.getElementById('newPass')?.addEventListener('input', (e) => validatePassword(e.target.value));
-
-            document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('authEmail').value;
-                const pass = document.getElementById('authPass').value;
-                const errEl = document.getElementById('authError');
-                const successEl = document.getElementById('authSuccess');
-                const submitBtn = document.getElementById('authSubmit');
-
-                errEl.textContent = "";
-                successEl.textContent = "";
-                submitBtn.disabled = true;
-                const originalText = submitBtn.textContent;
-                submitBtn.innerHTML = '<span class="animate-spin material-icons-outlined text-sm">autorenew</span> Processing...';
-
-                try {
-                    if (isRegisterMode) {
-                        if (!validatePassword(pass)) throw new Error("Password does not meet requirements.");
-                        const name = document.getElementById('regName').value;
-                        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-                        await cred.user.updateProfile({ displayName: name });
-                        document.getElementById('authSuccess').textContent = "Account created successfully!";
-                    } else {
-                        await auth.signInWithEmailAndPassword(email, pass);
+                window.resetForm = () => {
+                    const form = document.getElementById('contactForm');
+                    form?.reset();
+                    form?.classList.remove('hidden');
+                    document.getElementById('formSuccess')?.classList.add('hidden');
+                    const submitBtn = document.getElementById('submitBtn');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Send Message <span class="material-icons-outlined text-sm">send</span>';
                     }
-                    toggleLoginModal();
-                } catch (err) {
-                    errEl.textContent = err.message;
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalText;
-                }
-            });
+                };
 
-            window.forgotPassword = async () => {
-                if (!auth) {
-                    document.getElementById('authError').textContent = "Authentication service is unavailable.";
-                    return;
-                }
-                const email = document.getElementById('authEmail').value;
-                if (!email) {
-                    document.getElementById('authError').textContent = "Please enter your email address first.";
-                    return;
-                }
-                try {
-                    await auth.sendPasswordResetEmail(email);
-                    document.getElementById('authSuccess').textContent = "Password reset email sent! Check your inbox.";
-                    document.getElementById('authError').textContent = "";
-                } catch (err) {
-                    document.getElementById('authError').textContent = err.message;
-                    document.getElementById('authSuccess').textContent = "";
-                }
-            };
+                // ===== 3. UI LOGIC (Gallery, Reveal, etc.) =====
+                // Init theme
+                if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light-mode');
 
-            window.updateProfileName = async () => {
-                const newName = document.getElementById('profileName').value;
-                const msgEl = document.getElementById('profileMsg');
-                try {
-                    await auth.currentUser.updateProfile({ displayName: newName });
-                    document.getElementById('userNameDisplay').textContent = newName;
-                    document.getElementById('welcomeName').textContent = newName;
-                    msgEl.className = "text-xs text-center mt-1 text-green-400";
-                    msgEl.textContent = "Profile updated!";
-                } catch (err) {
-                    msgEl.className = "text-xs text-center mt-1 text-red-400";
-                    msgEl.textContent = err.message;
-                }
-            };
+                // Gallery
+                const gSlides = document.querySelectorAll('.gallery-slide');
+                const gDots = document.querySelectorAll('.gallery-dot');
+                let gIdx = 0;
+                const showSlide = (n) => {
+                    if (!gSlides.length) return;
+                    gSlides[gIdx].classList.remove('active');
+                    gDots[gIdx]?.classList.remove('active');
+                    gIdx = (n + gSlides.length) % gSlides.length;
+                    gSlides[gIdx].classList.add('active');
+                    gDots[gIdx]?.classList.add('active');
+                };
+                window.prevNextSlide = (step) => showSlide(gIdx + step);
+                window.jumpToSlide = (n) => showSlide(n);
+                setInterval(() => showSlide(gIdx + 1), 6000);
 
-            window.changePassword = async () => {
-                const currentPass = document.getElementById('currentPass').value;
-                const newPass = document.getElementById('newPass').value;
-                const msgEl = document.getElementById('passMsg');
+                // Scroll reveal
+                const revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+                }, { threshold: 0.1 });
+                document.querySelectorAll('.reveal, .stagger').forEach(el => revealObserver.observe(el));
 
-                if (!validatePassword(newPass)) {
-                    msgEl.className = "text-xs text-center mt-1 text-red-400";
-                    msgEl.textContent = "New password is not strong enough.";
-                    return;
-                }
-
-                try {
-                    const user = auth.currentUser;
-                    const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPass);
-                    await user.reauthenticateWithCredential(cred);
-                    await user.updatePassword(newPass);
-                    msgEl.className = "text-xs text-center mt-1 text-green-400";
-                    msgEl.textContent = "Password updated!";
-                    document.getElementById('currentPass').value = "";
-                    document.getElementById('newPass').value = "";
-                } catch (err) {
-                    msgEl.className = "text-xs text-center mt-1 text-red-400";
-                    msgEl.textContent = err.message;
-                }
-            };
-
-            // --- Chat Engine ---
-            const addMessage = (text, sender) => {
-                if (!messagesDiv) return;
-                const div = document.createElement('div');
-                div.className = `chat-msg ${sender}`;
-                if (sender === 'bot') {
-                    div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-                } else {
-                    div.textContent = text;
-                }
-                messagesDiv.appendChild(div);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                return div;
-            };
-
-            const sendMessage = async () => {
-                const text = input?.value.trim();
-                if (!text || isLoading || !GEMINI_API_KEY) {
-                    if (!GEMINI_API_KEY && text) addMessage("AI Assistant is currently in maintenance mode.", "bot");
-                    return;
-                }
-                addMessage(text, 'user');
-                input.value = '';
-                isLoading = true;
-
-                const typing = document.createElement('div');
-                typing.className = 'typing-indicator';
-                typing.innerHTML = '<span></span><span></span><span></span>';
-                messagesDiv.appendChild(typing);
-
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                            contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
-                        })
+                // Smooth Scroll
+                document.querySelectorAll('a[href^="#"]').forEach(a => {
+                    a.addEventListener('click', e => {
+                        e.preventDefault();
+                        const target = document.querySelector(a.getAttribute('href'));
+                        if (target) target.scrollIntoView({ behavior: 'smooth' });
+                        document.getElementById('mobileMenu')?.classList.remove('open');
                     });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Mă scuzați, a apărut o eroare.";
-
-                        // Add to history
-                        conversationHistory.push({ role: 'user', parts: [{ text }] });
-                        conversationHistory.push({ role: 'model', parts: [{ text: botText }] });
-
-                        // Prune history to last 10 messages (5 rounds) to prevent token limits/errors
-                        if (conversationHistory.length > 10) {
-                            conversationHistory = conversationHistory.slice(-10);
-                        }
-
-                        addMessage(botText, 'bot');
-                    } else {
-                        const errorData = await response.json().catch(() => ({}));
-                        console.error("Gemini Error:", errorData);
-                        addMessage("O eroare a apărut la procesarea mesajului. Vă rugăm să încercați din nou.", "bot");
-                    }
-                } catch (e) {
-                    console.error("Chat Error:", e);
-                    addMessage("Conexiunea cu asistentul AI a fost întreruptă.", "bot");
-                }
-
-                typing.remove();
-                isLoading = false;
-            };
-
-            sendBtn?.addEventListener('click', sendMessage);
-            input?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-            document.querySelectorAll('.chat-suggestion-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (input) { input.value = btn.dataset.msg; sendMessage(); }
                 });
-            });
-        })();
 
-        const loginModal = document.getElementById('loginModal');
-        window.toggleLoginModal = function () {
-            if (!loginModal) return;
-            loginModal.classList.toggle('active');
-            document.body.style.overflow = loginModal.classList.contains('active') ? 'hidden' : '';
-        };
+                // Mobile Menu
+                document.getElementById('mobileBtn')?.addEventListener('click', () => {
+                    document.getElementById('mobileMenu')?.classList.toggle('open');
+                });
 
-        // --- Chat Window Toggle (uses CSS class 'visible' and FAB class 'open') ---
-        let isChatOpen = false;
-        const chatFabBtn = document.getElementById('chatFab');
-        const chatWin = document.getElementById('chatWindow');
-        const fabIconEl = document.getElementById('fabIcon');
+                // ===== 4. FIREBASE AUTH =====
+                let auth = null;
+                try {
+                    if (appConfig.FIREBASE_CONFIG?.apiKey) {
+                        if (!firebase.apps.length) firebase.initializeApp(appConfig.FIREBASE_CONFIG);
+                        auth = firebase.auth();
+                        const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-        window.toggleChat = function () {
-            isChatOpen = !isChatOpen;
-            if (chatWin) chatWin.classList.toggle('visible', isChatOpen);
-            if (chatFabBtn) chatFabBtn.classList.toggle('open', isChatOpen);
-            if (fabIconEl) fabIconEl.textContent = isChatOpen ? 'close' : 'chat';
-            if (isChatOpen) {
-                setTimeout(() => document.getElementById('chatInput')?.focus(), 350);
-            }
-        };
+                        window.googleSignIn = async () => {
+                            const errEl = document.getElementById('authError');
+                            if (errEl) errEl.textContent = "";
+                            try {
+                                if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                                    await auth.signInWithRedirect(googleProvider);
+                                } else {
+                                    await auth.signInWithPopup(googleProvider);
+                                    window.toggleLoginModal();
+                                }
+                            } catch (err) {
+                                console.error("Auth Error:", err);
+                                if (errEl) errEl.textContent = "Sign-In failed.";
+                            }
+                        };
 
-        chatFabBtn.addEventListener('click', toggleChat);
-        document.getElementById('chatClose').addEventListener('click', toggleChat);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && isChatOpen) toggleChat();
-        });
+                        window.logout = () => auth.signOut().then(() => window.location.reload());
+
+                        auth.onAuthStateChanged((user) => {
+                            const landing = document.getElementById('landingPage');
+                            const dashboard = document.getElementById('userDashboard');
+                            const chatFab = document.getElementById('chatFab');
+                            if (user) {
+                                landing?.classList.add('hidden');
+                                dashboard?.classList.remove('hidden');
+                                chatFab?.classList.add('hidden');
+                                const nameDisplay = document.getElementById('userNameDisplay');
+                                if (nameDisplay) nameDisplay.textContent = user.displayName || user.email.split('@')[0];
+                            } else {
+                                landing?.classList.remove('hidden');
+                                dashboard?.classList.add('hidden');
+                                chatFab?.classList.remove('hidden');
+                            }
+                        });
+                    }
+                } catch (e) { console.warn("Firebase offline", e); }
+
+                // ===== 5. CHAT ENGINE =====
+                let conversationHistory = [];
+                let isChatLoading = false;
+                const chatMessages = document.getElementById('chatMessages');
+                const chatInput = document.getElementById('chatInput');
+
+                const addMessage = (text, sender) => {
+                    if (!chatMessages) return;
+                    const div = document.createElement('div');
+                    div.className = `chat-msg ${sender}`;
+                    div.innerHTML = sender === 'bot' ? text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : text;
+                    chatMessages.appendChild(div);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                };
+
+                const sendMessage = async () => {
+                    const text = chatInput?.value.trim();
+                    if (!text || isChatLoading || !GEMINI_API_KEY) return;
+                    addMessage(text, 'user');
+                    chatInput.value = '';
+                    isChatLoading = true;
+
+                    const typing = document.createElement('div');
+                    typing.className = 'typing-indicator';
+                    typing.innerHTML = '<span></span><span></span><span></span>';
+                    chatMessages.appendChild(typing);
+
+                    try {
+                        const response = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                                contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
+                            })
+                        });
+                        const data = await response.json();
+                        const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Eroare AI.";
+                        conversationHistory.push({ role: 'user', parts: [{ text }] }, { role: 'model', parts: [{ text: botText }] });
+                        if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
+                        addMessage(botText, 'bot');
+                    } catch (e) { addMessage("Eroare de conexiune.", "bot"); }
+                    typing.remove();
+                    isChatLoading = false;
+                };
+
+                document.getElementById('chatSend')?.addEventListener('click', sendMessage);
+                chatInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+                document.querySelectorAll('.chat-suggestion-btn').forEach(btn => {
+                    btn.addEventListener('click', () => { if (chatInput) { chatInput.value = btn.dataset.msg; sendMessage(); } });
+                });
+
+                // ===== 6. DASHBOARD LOGS =====
+                const logsContainer = document.getElementById('terminalLogs');
+                const logItems = ["SECURITY_SCAN: OK", "SYNCING_NEURAL... DONE", "ENCRYPTING... OK", "IP_FILTER: ACTIVE", "GEMINI: STABLE"];
+                setInterval(() => {
+                    if (!logsContainer || document.getElementById('userDashboard')?.classList.contains('hidden')) return;
+                    const div = document.createElement('div');
+                    div.className = "log-line text-xs opacity-80";
+                    div.innerHTML = `<span class="text-primary">[${new Date().toLocaleTimeString('en-GB')}]</span> ${logItems[Math.floor(Math.random() * logItems.length)]}`;
+                    logsContainer.prepend(div);
+                    if (logsContainer.children.length > 15) logsContainer.lastElementChild.remove();
+                }, 3000);
+
+                // Esc key for chat
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && document.getElementById('chatWindow')?.classList.contains('visible')) window.toggleChat();
+                });
+
+            })();
     </script>
 </body>
 
