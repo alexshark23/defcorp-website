@@ -89,7 +89,7 @@
             font-weight: 700;
         }
 
-        /* Animated Mesh Background */
+        /* Animated Mesh Background - Optimized for performance */
         .mesh-bg {
             position: fixed;
             top: 0;
@@ -98,23 +98,39 @@
             height: 100%;
             z-index: -1;
             background:
-                radial-gradient(at 0% 0%, hsla(190, 85%, 50%, 0.15) 0, transparent 50%),
-                radial-gradient(at 100% 0%, hsla(210, 85%, 50%, 0.1) 0, transparent 50%),
-                radial-gradient(at 100% 100%, hsla(190, 85%, 50%, 0.15) 0, transparent 50%),
-                radial-gradient(at 0% 100%, hsla(210, 85%, 50%, 0.1) 0, transparent 50%);
+                radial-gradient(at 0% 0%, hsla(190, 85%, 50%, 0.12) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(210, 85%, 50%, 0.08) 0, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(190, 85%, 50%, 0.12) 0, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(210, 85%, 50%, 0.08) 0, transparent 50%);
             background-color: var(--bg-dark);
-            filter: blur(80px);
-            animation: meshMove 20s ease-in-out infinite alternate;
+            filter: blur(40px);
+            /* Reduced from 80px for smoothness */
+            animation: meshMove 25s ease-in-out infinite alternate;
+            will-change: transform;
+            pointer-events: none;
         }
 
         @keyframes meshMove {
             0% {
-                transform: scale(1);
+                transform: scale(1) translate(0, 0);
             }
 
             100% {
-                transform: scale(1.1);
+                transform: scale(1.05) translate(2%, 2%);
             }
+        }
+
+        /* Subtle Scanline Texture for 'Cyber' Feel */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
+            background-size: 100% 2px, 3px 100%;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.15;
         }
 
         /* Input & Form Styling */
@@ -526,6 +542,7 @@
         .reveal.visible {
             opacity: 1;
             transform: translateY(0);
+            will-change: transform, opacity;
         }
 
         /* Stagger children */
@@ -566,10 +583,26 @@
         }
 
         .service-card:hover {
-            border-color: rgba(19, 200, 236, 0.6);
-            transform: translateY(-8px);
-            box-shadow: 0 25px 50px -12px rgba(19, 200, 236, 0.2);
-            background: rgba(19, 200, 236, 0.05);
+            border-color: rgba(19, 200, 236, 0.8);
+            transform: translateY(-12px);
+            box-shadow: 0 30px 60px -12px rgba(19, 200, 236, 0.25);
+            background: rgba(19, 200, 236, 0.08);
+        }
+
+        .service-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover::after {
+            transform: scaleX(1);
         }
 
         /* Button press */
@@ -595,7 +628,42 @@
             }
 
             50% {
-                box-shadow: 0 0 20px 4px rgba(19, 200, 236, 0.15);
+                box-shadow: 0 0 30px 6px rgba(19, 200, 236, 0.2);
+            }
+        }
+
+        /* Shimmering Button Effect */
+        .btn-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-shimmer::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent);
+            transform: rotate(45deg);
+            animation: shimmerEffect 4s infinite;
+        }
+
+        @keyframes shimmerEffect {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            20% {
+                transform: translateX(100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
             }
         }
 
@@ -1321,7 +1389,7 @@
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a href="#contact"
-                            class="ripple btn-press glow-pulse px-8 py-4 bg-primary text-slate-900 font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
+                            class="ripple btn-press btn-shimmer glow-pulse px-8 py-4 bg-primary text-slate-900 font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
                             Start a Project
                             <span class="material-icons-outlined">arrow_forward</span>
                         </a>
@@ -1507,7 +1575,7 @@
                                 included</li>
                         </ul>
                         <a href="#contact"
-                            class="btn-press w-full py-3 border border-primary/30 text-primary rounded-lg hover:bg-primary/10 transition-all text-sm font-bold uppercase tracking-widest text-center block">Select</a>
+                            class="btn-press btn-shimmer w-full py-3 border border-primary/30 text-primary rounded-lg hover:bg-primary/10 transition-all text-sm font-bold uppercase tracking-widest text-center block">Select</a>
                     </div>
                     <div
                         class="service-card p-10 rounded-2xl bg-white/[0.05] backdrop-blur-2xl flex flex-col relative border-primary/30 shadow-xl shadow-primary/10">
@@ -1535,7 +1603,7 @@
                                 dashboard</li>
                         </ul>
                         <a href="#contact"
-                            class="btn-press glow-pulse w-full py-3 bg-primary text-slate-900 rounded-lg hover:brightness-110 transition-all text-sm font-bold uppercase tracking-widest text-center block">Select</a>
+                            class="btn-press btn-shimmer glow-pulse w-full py-3 bg-primary text-slate-900 rounded-lg hover:brightness-110 transition-all text-sm font-bold uppercase tracking-widest text-center block">Select</a>
                     </div>
                     <div
                         class="service-card p-10 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/10 flex flex-col">
@@ -1652,7 +1720,7 @@
                                     class="w-full bg-input-bg border border-input-border rounded-lg px-4 py-3 text-sm focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-muted resize-none"></textarea>
                             </div>
                             <button type="submit" id="submitBtn"
-                                class="btn-press ripple w-full py-4 bg-primary text-slate-900 font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
+                                class="ripple btn-press btn-shimmer w-full py-4 bg-primary text-slate-900 font-bold rounded-lg hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
                                 Send Message
                                 <span class="material-icons-outlined text-sm">send</span>
                             </button>
