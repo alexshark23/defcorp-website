@@ -2281,6 +2281,86 @@
                     }
                 };
 
+                // ===== AUTH HELPERS =====
+                window.switchAuthMode = () => {
+                    const isReg = document.getElementById('registerFields').classList.toggle('hidden');
+                    const title = document.querySelector('#loginModal h4');
+                    const submit = document.getElementById('authSubmit');
+                    const switcher = document.getElementById('switchAuth');
+                    const strength = document.getElementById('passwordStrength');
+                    const forgot = document.getElementById('forgotPassWrap');
+
+                    if (!isReg) { // Registration Mode
+                        if (title) title.innerHTML = 'Join <span class="text-primary italic">DEF Portal</span>';
+                        submit.textContent = 'Create Account';
+                        switcher.textContent = 'Already have an account? Sign In';
+                        strength?.classList.remove('hidden');
+                        forgot?.classList.add('hidden');
+                    } else { // Login Mode
+                        if (title) title.innerHTML = 'DEF <span class="text-primary italic">Portal</span>';
+                        submit.textContent = 'Sign In';
+                        switcher.textContent = "Don't have an account? Create one";
+                        strength?.classList.add('hidden');
+                        forgot?.classList.remove('hidden');
+                    }
+                };
+
+                window.validatePassword = (pass, barPrefix, labelId, ruleClass) => {
+                    let score = 0;
+                    if (pass.length >= 8) score++;
+                    if (/[A-Z]/.test(pass)) score++;
+                    if (/[0-9]/.test(pass)) score++;
+                    if (/[^A-Za-z0-9]/.test(pass)) score++;
+
+                    const labels = ["WEAK", "FAIR", "GOOD", "STRONG"];
+                    const colors = ["bg-red-500", "bg-yellow-500", "bg-blue-500", "bg-primary"];
+                    const labelEl = document.getElementById(labelId);
+                    if (labelEl) {
+                        labelEl.textContent = pass ? labels[score - 1] || "WEAK" : "";
+                        labelEl.className = `text-[10px] font-bold uppercase tracking-widest ${pass ? 'text-primary' : 'text-muted'}`;
+                    }
+
+                    for (let i = 1; i <= 4; i++) {
+                        const bar = document.getElementById(`${barPrefix}${i}`);
+                        if (bar) {
+                            bar.className = `h-1 rounded-full flex-1 transition-all ${i <= score ? colors[score - 1] : 'bg-white/10'}`;
+                        }
+                    }
+
+                    // Update rule icons
+                    const rules = document.querySelectorAll(`.${ruleClass}`);
+                    rules.forEach(el => {
+                        const rule = el.dataset.rule;
+                        let met = false;
+                        if (rule === 'length') met = pass.length >= 8;
+                        if (rule === 'uppercase') met = /[A-Z]/.test(pass);
+                        if (rule === 'number') met = /[0-9]/.test(pass);
+                        if (rule === 'special') met = /[^A-Za-z0-9]/.test(pass);
+
+                        const icon = el.querySelector('span');
+                        if (icon) {
+                            icon.textContent = met ? 'check_circle' : 'circle';
+                            icon.className = `material-symbols-outlined text-[14px] ${met ? 'text-primary' : 'text-slate-600'}`;
+                        }
+                    });
+                };
+
+                window.forgotPassword = async () => {
+                    const email = document.getElementById('authEmail').value;
+                    const errEl = document.getElementById('authError');
+                    const succEl = document.getElementById('authSuccess');
+                    if (!email) {
+                        if (errEl) errEl.textContent = "Please enter your email first.";
+                        return;
+                    }
+                    try {
+                        await auth.sendPasswordResetEmail(email);
+                        if (succEl) succEl.textContent = "Reset link sent to your email!";
+                    } catch (err) {
+                        if (errEl) errEl.textContent = err.message;
+                    }
+                };
+
                 // ===== 3. UI LOGIC (Gallery, Reveal, etc.) =====
                 // Init theme
                 if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light-mode');
@@ -2358,11 +2438,92 @@
                                 chatFab?.classList.add('hidden');
                                 const nameDisplay = document.getElementById('userNameDisplay');
                                 if (nameDisplay) nameDisplay.textContent = user.displayName || user.email.split('@')[0];
+
+                                // Sync Profile Inputs
+                                const pName = document.getElementById('profileName');
+                                const pEmail = document.getElementById('profileEmail');
+                                if (pName) pName.value = user.displayName || "";
+                                if (pEmail) pEmail.value = user.email || "";
                             } else {
                                 landing?.classList.remove('hidden');
                                 dashboard?.classList.add('hidden');
                                 chatFab?.classList.remove('hidden');
                             }
+                        });
+
+                        // Form Handler
+                        document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            const email = document.getElementById('authEmail').value;
+                            const pass = document.getElementById('authPass').value;
+                            const name = document.getElementById('regName').value;
+                            const isReg = !document.getElementById('registerFields').classList.contains('hidden');
+                            const errEl = document.getElementById('authError');
+                            const succEl = document.getElementById('authSuccess');
+
+                            if (errEl) errEl.textContent = "";
+                            if (succEl) succEl.textContent = "";
+
+                            try {
+                                if (isReg) {
+                                    const res = await auth.createUserWithEmailAndPassword(email, pass);
+                                    if (name) await res.user.updateProfile({ displayName: name });
+                                    if (succEl) succEl.textContent = "Account created! Logging in...";
+                                } else {
+                                    await auth.signInWithEmailAndPassword(email, pass);
+                                }
+                                window.toggleLoginModal();
+                            } catch (err) {
+                                if (errEl) errEl.textContent = err.message;
+                            }
+                        });
+
+                        // Profile Management
+                        window.updateProfileName = async () => {
+                            const newName = document.getElementById('profileName').value;
+                            const msg = document.getElementById('profileMsg');
+                            try {
+                                await auth.currentUser.updateProfile({ displayName: newName });
+                                if (msg) {
+                                    msg.textContent = "Name updated successfully!";
+                                    msg.className = "text-xs text-center mt-1 text-primary";
+                                }
+                                document.getElementById('userNameDisplay').textContent = newName;
+                            } catch (err) {
+                                if (msg) {
+                                    msg.textContent = err.message;
+                                    msg.className = "text-xs text-center mt-1 text-red-400";
+                                }
+                            }
+                        };
+
+                        window.changePassword = async () => {
+                            const currentPass = document.getElementById('currentPass').value;
+                            const newPass = document.getElementById('newPass').value;
+                            const msg = document.getElementById('passMsg');
+                            if (!currentPass || !newPass) return;
+                            try {
+                                const credential = firebase.auth.EmailAuthProvider.credential(auth.currentUser.email, currentPass);
+                                await auth.currentUser.reauthenticateWithCredential(credential);
+                                await auth.currentUser.updatePassword(newPass);
+                                if (msg) {
+                                    msg.textContent = "Password updated!";
+                                    msg.className = "text-xs text-center mt-1 text-primary";
+                                }
+                            } catch (err) {
+                                if (msg) {
+                                    msg.textContent = err.message;
+                                    msg.className = "text-xs text-center mt-1 text-red-400";
+                                }
+                            }
+                        };
+
+                        // Password Strength Listeners
+                        document.getElementById('authPass')?.addEventListener('input', (e) => {
+                            window.validatePassword(e.target.value, 'pwBar', 'pwLabel', 'pw-rule');
+                        });
+                        document.getElementById('newPass')?.addEventListener('input', (e) => {
+                            window.validatePassword(e.target.value, 'pwBarReset', 'pwLabelReset', 'pw-rule-reset');
                         });
                     }
                 } catch (e) { console.warn("Firebase offline", e); }
