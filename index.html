@@ -2111,7 +2111,7 @@
     </div>
 
     <!-- ===== Chat Widget HTML ===== -->
-    <button class="chat-fab" id="chatFab" aria-label="Open chat">
+    <button class="chat-fab" id="chatFab" onclick="toggleChat()" aria-label="Open chat">
         <span class="material-icons-outlined fab-icon" id="fabIcon">chat</span>
     </button>
 
@@ -2124,7 +2124,7 @@
                 <div class="chat-header-title">DEF AI Assistant</div>
                 <div class="chat-header-status">Online</div>
             </div>
-            <button class="chat-header-close" id="chatClose" aria-label="Close chat">
+            <button class="chat-header-close" id="chatClose" onclick="toggleChat()" aria-label="Close chat">
                 <span class="material-icons-outlined" style="font-size:20px">close</span>
             </button>
         </div>
