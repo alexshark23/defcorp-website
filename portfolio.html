@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Alexandru Glonț — IT · Cybersecurity · AI Automation</title>
+    <meta name="description"
+        content="Personal portfolio of Alexandru Glonț — IT Specialist, Cybersecurity Practitioner, and AI Automation Expert based in Bucharest, Romania." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ═══════════════════════════════════════════════
+           DESIGN SYSTEM — Tokens & Reset
+        ═══════════════════════════════════════════════ */
+        :root {
+            --bg: #07090c;
+            --bg-card: rgba(255, 255, 255, 0.025);
+            --bg-card-hover: rgba(255, 255, 255, 0.05);
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-2: #06b6d4;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --radius: 16px;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --max-w: 860px;
+            --transition: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ═══════════════════════════════════════════════
+           AMBIENT BACKGROUND
+        ═══════════════════════════════════════════════ */
+        .ambient {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ambient::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            top: -120px;
+            right: -100px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent 70%);
+            animation: floatA 20s ease-in-out infinite alternate;
+        }
+
+        .ambient::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            bottom: -80px;
+            left: -100px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.06), transparent 70%);
+            animation: floatB 25s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatA {
+            to {
+                transform: translate(-60px, 80px) scale(1.1);
+            }
+        }
+
+        @keyframes floatB {
+            to {
+                transform: translate(50px, -60px) scale(1.15);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════
+           LAYOUT
+        ═══════════════════════════════════════════════ */
+        .page {
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 80px 24px 120px;
+        }
+
+        section {
+            margin-bottom: 72px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           FADE-IN
+        ═══════════════════════════════════════════════ */
+        .fi {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fi.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════════════════════════════════════════════
+           HEADER / HERO
+        ═══════════════════════════════════════════════ */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: center;
+            padding-bottom: 56px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero__info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .hero__photo {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .hero__photo img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-hover);
+            transition: all var(--transition);
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero__photo:hover img {
+            border-color: var(--accent);
+            transform: scale(1.03);
+        }
+
+        .hero__photo::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            opacity: 0.15;
+            filter: blur(12px);
+            z-index: 0;
+            transition: opacity var(--transition);
+        }
+
+        .hero__photo:hover::before {
+            opacity: 0.35;
+        }
+
+        .hero__status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #22c55e;
+        }
+
+        .hero__status .dot {
+            width: 7px;
+            height: 7px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+            }
+
+            50% {
+                opacity: 0.7;
+                box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero__subtitle {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 540px;
+            line-height: 1.7;
+        }
+
+        .hero__meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .hero__meta a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hero__meta a:hover {
+            color: var(--accent);
+        }
+
+        .hero__meta .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           SECTION TITLES
+        ═══════════════════════════════════════════════ */
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ═══════════════════════════════════════════════
+           EXPERTISE CARDS
+        ═══════════════════════════════════════════════ */
+        .expertise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .exp-card {
+            padding: 28px 24px;
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exp-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+        }
+
+        .exp-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .exp-card:hover::before {
+            opacity: 1;
+        }
+
+        .exp-card .material-symbols-outlined {
+            font-size: 28px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .exp-card h3 {
+            font-family: var(--font-heading);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .exp-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════════════
+           EXPERIENCE TIMELINE
+        ═══════════════════════════════════════════════ */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 32px;
+            padding: 28px 0;
+            border-bottom: 1px solid var(--border);
+            transition: background var(--transition);
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+            padding-top: 3px;
+        }
+
+        .timeline-content h3 {
+            font-family: var(--font-heading);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .timeline-content .company {
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .timeline-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .timeline-content ul li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 3px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .timeline-content ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 11px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--border-hover);
+        }
+
+        /* ═══════════════════════════════════════════════
+           PROJECTS
+        ═══════════════════════════════════════════════ */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .project-card {
+            padding: 28px 24px;
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+
+        .project-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+        }
+
+        .project-card h3 {
+            font-family: var(--font-heading);
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .project-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-radius: 6px;
+            background: rgba(59, 130, 246, 0.08);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.12);
+        }
+
+        /* ═══════════════════════════════════════════════
+           CERTIFICATIONS
+        ═══════════════════════════════════════════════ */
+        .certs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .cert-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+
+        .cert-item:hover {
+            padding-left: 12px;
+        }
+
+        .cert-item:last-child {
+            border-bottom: none;
+        }
+
+        .cert-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .cert-issuer {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .cert-date {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        /* ═══════════════════════════════════════════════
+           SKILLS
+        ═══════════════════════════════════════════════ */
+        .skills-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+        }
+
+        .skill-group h3 {
+            font-family: var(--font-heading);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .skill-item {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color var(--transition);
+        }
+
+        .skill-item:hover {
+            color: var(--text-primary);
+        }
+
+        .skill-item::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════════════════
+           EDUCATION & LANGUAGES
+        ═══════════════════════════════════════════════ */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .meta-block h3 {
+            font-family: var(--font-heading);
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .meta-block p,
+        .meta-block span {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lang-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .lang-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .lang-item .level {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           CTA
+        ═══════════════════════════════════════════════ */
+        .cta-section {
+            text-align: center;
+            padding: 56px 32px;
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, var(--accent-glow), transparent 60%);
+            pointer-events: none;
+        }
+
+        .cta-section h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        /* ═══════════════════════════════════════════════
+           FOOTER
+        ═══════════════════════════════════════════════ */
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
+
+        /* ═══════════════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════════════ */
+        @media (max-width: 640px) {
+            .page {
+                padding: 48px 20px 80px;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero__info {
+                align-items: center;
+            }
+
+            .hero__photo {
+                order: -1;
+                justify-self: center;
+            }
+
+            .hero__photo img {
+                width: 140px;
+                height: 140px;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero__meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            section {
+                margin-bottom: 56px;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════
+           PRINT
+        ═══════════════════════════════════════════════ */
+        @media print {
+            body {
+                background: #fff;
+                color: #111;
+            }
+
+            .ambient,
+            .cta-section {
+                display: none;
+            }
+
+            .fi {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+
+            .exp-card,
+            .project-card {
+                border: 1px solid #ddd;
+                background: #fafafa;
+            }
+
+            .cert-item,
+            .timeline-item {
+                border-color: #eee;
+            }
+
+            .section-label {
+                color: #333;
+            }
+
+            .tag {
+                background: #f0f0f0;
+                color: #333;
+                border-color: #ddd;
+            }
+
+            a {
+                color: #333;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ambient"></div>
+
+    <main class="page">
+
+        <!-- ═══════ HERO ═══════ -->
+        <section class="hero fi" id="top">
+            <div class="hero__info">
+                <div class="hero__status"><span class="dot"></span> Available for Opportunities</div>
+                <h1>Alexandru Glonț<br /><span>IT · Cybersecurity · AI Automation</span></h1>
+                <p class="hero__subtitle">
+                    IT Specialist with hands-on experience in enterprise support, cybersecurity, and AI automation.
+                    I build intelligent systems, secure digital infrastructures, and automate complex workflows.
+                </p>
+                <div class="hero__meta">
+                    <a href="mailto:alexandruglow@gmail.com">
+                        <span class="material-symbols-outlined">mail</span> alexandruglow@gmail.com
+                    </a>
+                    <a href="https://linkedin.com/in/alexandru-glon%C8%9B-220a701bb" target="_blank">
+                        <span class="material-symbols-outlined">link</span> LinkedIn
+                    </a>
+                    <a href="https://defcorp.xyz" target="_blank">
+                        <span class="material-symbols-outlined">language</span> defcorp.xyz
+                    </a>
+                    <span style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;">location_on</span> Bucharest,
+                        Romania
+                    </span>
+                </div>
+            </div>
+            <div class="hero__photo">
+                <img src="profile_photo.png" alt="Alexandru Glonț — Profile Photo" />
+            </div>
+        </section>
+
+        <!-- ═══════ CORE EXPERTISE ═══════ -->
+        <section class="fi">
+            <div class="section-label">Core Expertise</div>
+            <div class="expertise-grid">
+                <div class="exp-card">
+                    <span class="material-symbols-outlined">smart_toy</span>
+                    <h3>AI Automation</h3>
+                    <p>Custom AI agents with Gemini &amp; GPT APIs. Multi-model fallback systems, intelligent chatbots,
+                        and
+                        end-to-end automation with n8n, Make.com, and Zapier.</p>
+                </div>
+                <div class="exp-card">
+                    <span class="material-symbols-outlined">shield</span>
+                    <h3>Cybersecurity</h3>
+                    <p>Vulnerability assessment, security auditing, exposure management. Implementing secure cloud
+                        architectures and infrastructure hardening.</p>
+                </div>
+                <div class="exp-card">
+                    <span class="material-symbols-outlined">terminal</span>
+                    <h3>IT Support & Infra</h3>
+                    <p>Enterprise hardware &amp; software troubleshooting, network diagnostics, Windows 11
+                        administration,
+                        and professional-level help desk support.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════ EXPERIENCE ═══════ -->
+        <section class="fi">
+            <div class="section-label">Experience</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Sep 2024 — Present</div>
+                    <div class="timeline-content">
+                        <h3>IT Technician</h3>
+                        <div class="company">Skywind Group</div>
+                        <ul>
+                            <li>Hardware and software troubleshooting for enterprise systems</li>
+                            <li>IT infrastructure maintenance and internal technical support</li>
+                            <li>Technical incident resolution with optimized time-to-resolution</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2024 — Present</div>
+                    <div class="timeline-content">
+                        <h3>AI Automation Specialist</h3>
+                        <div class="company">DEF Corp — Freelance</div>
+                        <ul>
+                            <li>Built custom AI chatbots with Gemini API and multi-model fallback</li>
+                            <li>Professional website with Firebase authentication and live integrated chatbot</li>
+                            <li>Automated lead management pipeline: Google Forms → Sheets → Email → Telegram → Notion
+                            </li>
+                            <li>Workflow automation with n8n, Make.com, and Zapier</li>
+                            <li>Full codebase security audit and vulnerability remediation</li>
+                            <li>CI/CD deployment with GitHub Actions on GitHub Pages</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Feb 2022 — Aug 2025</div>
+                    <div class="timeline-content">
+                        <h3>iGaming &amp; Live Casino Operations</h3>
+                        <div class="company">Skywind Group &middot; Ezugi</div>
+                        <ul>
+                            <li>3+ years in the regulated iGaming industry, operating live studio broadcast environments</li>
+                            <li>Real-time decision making and multi-tasking under high-pressure, live production conditions</li>
+                            <li>Professional on-camera communication with global audiences across multiple markets</li>
+                            <li>Strict compliance with gaming regulations, SOPs, and quality assurance protocols</li>
+                            <li>Technical proficiency with broadcast equipment, streaming platforms, and studio systems</li>
+                            <li>Cross-functional collaboration with floor managers, pit bosses, and technical teams</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════ PROJECTS ═══════ -->
+        <section class="fi">
+            <div class="section-label">Key Projects</div>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <h3>DEF Corp Website</h3>
+                    <p>Professional landing page for an AI &amp; Cybersecurity firm. Dark theme with glassmorphism,
+                        Firebase authentication (email + Google), live AI chatbot with Gemini, functional contact form,
+                        and CI/CD deployment.</p>
+                    <div class="project-tags">
+                        <span class="tag">HTML/CSS/JS</span>
+                        <span class="tag">Firebase</span>
+                        <span class="tag">Gemini API</span>
+                        <span class="tag">GitHub Pages</span>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <h3>AI Chatbot — Multi-Model</h3>
+                    <p>Chatbot system with multi-model Gemini fallback (2.5 Flash → 2.0 Flash → 1.5 Flash).
+                        Resilient to rate limiting and API errors, with contextual responses and fluid UX.</p>
+                    <div class="project-tags">
+                        <span class="tag">Gemini API</span>
+                        <span class="tag">JavaScript</span>
+                        <span class="tag">REST APIs</span>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <h3>Lead Management Automation</h3>
+                    <p>Fully automated pipeline: lead capture from Google Forms, storage in Sheets, automated
+                        personalized emails, Telegram notifications, and CRM integration with Notion.</p>
+                    <div class="project-tags">
+                        <span class="tag">Make.com</span>
+                        <span class="tag">Google Apps</span>
+                        <span class="tag">Telegram Bot</span>
+                        <span class="tag">Notion API</span>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <h3>Security Audit & Hardening</h3>
+                    <p>Complete security audit of a web codebase. Identified and remediated credential exposure,
+                        XSS, and authentication issues. Implemented Content Security Policy.</p>
+                    <div class="project-tags">
+                        <span class="tag">Security</span>
+                        <span class="tag">CSP</span>
+                        <span class="tag">API Security</span>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <h3>Multi-Agent AI System</h3>
+                    <p>3-layer architecture (Directive → Orchestration → Execution) for operating multiple specialized
+                        AI agents: PM, Marketing, and Technical agents.</p>
+                    <div class="project-tags">
+                        <span class="tag">AI Agents</span>
+                        <span class="tag">Architecture</span>
+                        <span class="tag">Automation</span>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <h3>Google Workspace Admin</h3>
+                    <p>Complete Google Workspace setup for a custom domain (defcorp.xyz) — DNS, MX records,
+                        user administration, and organizational security configuration.</p>
+                    <div class="project-tags">
+                        <span class="tag">DNS</span>
+                        <span class="tag">Google Admin</span>
+                        <span class="tag">Cloud</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════ CERTIFICATIONS ═══════ -->
+        <section class="fi">
+            <div class="section-label">Certifications & Licenses</div>
+            <div class="certs-list">
+                <div class="cert-item">
+                    <div>
+                        <div class="cert-name">Learning Network Troubleshooting: Practical Diagnostics & Solutions</div>
+                        <div class="cert-issuer">LinkedIn Learning</div>
+                    </div>
+                    <div class="cert-date">Feb 2026</div>
+                </div>
+                <div class="cert-item">
+                    <div>
+                        <div class="cert-name">Troubleshooting Common PC Issues for Users</div>
+                        <div class="cert-issuer">LinkedIn Learning</div>
+                    </div>
+                    <div class="cert-date">Feb 2026</div>
+                </div>
+                <div class="cert-item">
+                    <div>
+                        <div class="cert-name">Windows 11 for IT Support: Advanced, Intermediate & Basics</div>
+                        <div class="cert-issuer">LinkedIn Learning</div>
+                    </div>
+                    <div class="cert-date">Jan 2026</div>
+                </div>
+                <div class="cert-item">
+                    <div>
+                        <div class="cert-name">Build AI Agents and Automate Workflows with n8n</div>
+                        <div class="cert-issuer">LinkedIn Learning · Morten Rand-Hendriksen</div>
+                    </div>
+                    <div class="cert-date">Jan 2026</div>
+                </div>
+                <div class="cert-item">
+                    <div>
+                        <div class="cert-name">Advent of Cyber 2025</div>
+                        <div class="cert-issuer">TryHackMe</div>
+                    </div>
+                    <div class="cert-date">Dec 2025</div>
+                </div>
+                <div class="cert-item">
+                    <div>
+                        <div class="cert-name">Computer Hardware Basics</div>
+                        <div class="cert-issuer">Cisco</div>
+                    </div>
+                    <div class="cert-date">Nov 2025</div>
+                </div>
+                <div class="cert-item">
+                    <div>
+                        <div class="cert-name">Exposure Management Expert</div>
+                        <div class="cert-issuer">XM Cyber</div>
+                    </div>
+                    <div class="cert-date">—</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════ SKILLS ═══════ -->
+        <section class="fi">
+            <div class="section-label">Technical Skills</div>
+            <div class="skills-section">
+                <div class="skill-group">
+                    <h3>AI & Automation</h3>
+                    <div class="skill-list">
+                        <div class="skill-item">Google Gemini API</div>
+                        <div class="skill-item">AI Agents & Multi-Model Systems</div>
+                        <div class="skill-item">n8n Workflow Automation</div>
+                        <div class="skill-item">Make.com / Zapier</div>
+                        <div class="skill-item">Prompt Engineering</div>
+                        <div class="skill-item">Python Scripting</div>
+                    </div>
+                </div>
+                <div class="skill-group">
+                    <h3>Security & IT</h3>
+                    <div class="skill-list">
+                        <div class="skill-item">Cybersecurity Auditing</div>
+                        <div class="skill-item">Exposure Management</div>
+                        <div class="skill-item">Network Troubleshooting</div>
+                        <div class="skill-item">PC & Hardware Diagnostics</div>
+                        <div class="skill-item">Windows 11 Administration</div>
+                        <div class="skill-item">Help Desk Support</div>
+                    </div>
+                </div>
+                <div class="skill-group">
+                    <h3>Web & Cloud</h3>
+                    <div class="skill-list">
+                        <div class="skill-item">HTML / CSS / JavaScript</div>
+                        <div class="skill-item">Firebase (Auth, Firestore)</div>
+                        <div class="skill-item">REST API Integration</div>
+                        <div class="skill-item">GitHub Actions / CI/CD</div>
+                        <div class="skill-item">Google Workspace Admin</div>
+                        <div class="skill-item">DNS & Domain Management</div>
+                    </div>
+                </div>
+                <div class="skill-group">
+                    <h3>Soft Skills</h3>
+                    <div class="skill-list">
+                        <div class="skill-item">Problem Solving</div>
+                        <div class="skill-item">Communication</div>
+                        <div class="skill-item">Attention to Detail</div>
+                        <div class="skill-item">Time Management</div>
+                        <div class="skill-item">Critical Thinking</div>
+                        <div class="skill-item">Fast Learner</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════ EDUCATION & LANGUAGES ═══════ -->
+        <section class="fi">
+            <div class="section-label">Education & Languages</div>
+            <div class="meta-grid">
+                <div class="meta-block">
+                    <h3>Telecommunications Technician</h3>
+                    <p style="color:var(--accent);font-size:13px;margin-bottom:4px;">Automation Engineering Technology
+                    </p>
+                    <span>"Henri Coandă" Technical High School · 2014 — 2017</span>
+                </div>
+                <div class="meta-block">
+                    <h3>Languages</h3>
+                    <div class="lang-grid" style="margin-top:8px;">
+                        <div class="lang-item">
+                            <span>Romanian</span>
+                            <span class="level">Native</span>
+                        </div>
+                        <div class="lang-item">
+                            <span>English</span>
+                            <span class="level">Fluent</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════ CTA ═══════ -->
+        <section class="fi cta-section" id="contact">
+            <h2>Available for New Opportunities</h2>
+            <p>Whether you need an IT specialist, a security expert, or a custom AI system — I'm ready.</p>
+            <div class="cta-buttons">
+                <a href="mailto:alexandruglow@gmail.com" class="btn btn-primary">
+                    <span class="material-symbols-outlined" style="font-size:18px;">mail</span> Get in Touch
+                </a>
+                <a href="https://linkedin.com/in/alexandru-glon%C8%9B-220a701bb" target="_blank"
+                    class="btn btn-secondary">
+                    <span class="material-symbols-outlined" style="font-size:18px;">link</span> LinkedIn
+                </a>
+                <a href="index.html" class="btn btn-secondary">
+                    <span class="material-symbols-outlined" style="font-size:18px;">language</span> DEF Corp
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        Alexandru Glonț © 2026 — Built with precision
+    </footer>
+
+    <!-- Scroll Reveal -->
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.08,
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        document.querySelectorAll('.fi').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>
