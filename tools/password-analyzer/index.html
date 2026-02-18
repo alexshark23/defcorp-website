@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Password Security Analyzer — DEF Corp</title>
+    <meta name="description"
+        content="Analyze your password strength, check for data breaches, and generate secure passwords. A cybersecurity tool by DEF Corp." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ═══════════════════════════════════════════════
+           DESIGN SYSTEM — Same tokens as DEF Corp
+        ═══════════════════════════════════════════════ */
+        :root {
+            --bg: #07090c;
+            --bg-card: rgba(255, 255, 255, 0.025);
+            --bg-card-hover: rgba(255, 255, 255, 0.05);
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-2: #06b6d4;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --radius: 16px;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --max-w: 900px;
+            --transition: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+            /* Strength colors */
+            --color-critical: #ef4444;
+            --color-weak: #f97316;
+            --color-fair: #eab308;
+            --color-strong: #22c55e;
+            --color-excellent: #06b6d4;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ═══════ Ambient Background ═══════ */
+        .ambient {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .ambient::before,
+        .ambient::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.08;
+        }
+
+        .ambient::before {
+            width: 600px;
+            height: 600px;
+            background: var(--accent);
+            top: -200px;
+            left: -100px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .ambient::after {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-2);
+            bottom: -200px;
+            right: -100px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(60px, 40px);
+            }
+        }
+
+        /* ═══════ Header ═══════ */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 9, 12, 0.8);
+        }
+
+        .header__brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .header__logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: var(--font-heading);
+        }
+
+        .header__title {
+            font-family: var(--font-heading);
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .header__nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .header__nav a:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+        }
+
+        /* ═══════ Main Content ═══════ */
+        .page {
+            max-width: var(--max-w);
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+
+        .page__header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            background: var(--accent-glow);
+        }
+
+        .page__title {
+            font-family: var(--font-heading);
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        .page__title span {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page__subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* ═══════ Input Section ═══════ */
+        .input-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+            transition: var(--transition);
+        }
+
+        .input-section:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-group input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 50px 16px 20px;
+            font-size: 17px;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition);
+            letter-spacing: 1px;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            letter-spacing: 0;
+        }
+
+        .toggle-visibility {
+            position: absolute;
+            right: 140px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            transition: var(--transition);
+        }
+
+        .toggle-visibility:hover {
+            color: var(--text-primary);
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: var(--font-body);
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        /* ═══════ Strength Meter ═══════ */
+        .strength-meter {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .strength-meter.active {
+            display: block;
+        }
+
+        .meter-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .meter-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.6s ease, background 0.6s ease;
+            width: 0%;
+        }
+
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meter-label__text {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .meter-label__score {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ═══════ Results Grid ═══════ */
+        .results {
+            display: none;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .results.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            animation: fadeUp 0.5s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        .result-card:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .result-card__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            font-size: 20px;
+        }
+
+        .result-card__title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .result-card__value {
+            font-family: var(--font-heading);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .result-card__detail {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Icon backgrounds */
+        .icon-time {
+            background: rgba(234, 179, 8, 0.1);
+            color: #eab308;
+        }
+
+        .icon-entropy {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .icon-breach {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .icon-common {
+            background: rgba(249, 115, 22, 0.1);
+            color: #f97316;
+        }
+
+        /* ═══════ Analysis Details ═══════ */
+        .analysis-section {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .analysis-section.active {
+            display: block;
+            animation: fadeUp 0.5s ease 0.2s both;
+        }
+
+        .analysis-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 16px;
+        }
+
+        .analysis-card h3 {
+            font-family: var(--font-heading);
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .check-pass {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .check-fail {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .check-warn {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+        }
+
+        /* ═══════ Recommendations ═══════ */
+        .recommendations {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .recommendations.active {
+            display: block;
+            animation: fadeUp 0.5s ease 0.3s both;
+        }
+
+        .rec-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+        }
+
+        .rec-card h3 {
+            font-family: var(--font-heading);
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rec-list {
+            list-style: none;
+        }
+
+        .rec-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .rec-list li:last-child {
+            border-bottom: none;
+        }
+
+        .rec-list .material-symbols-outlined {
+            color: var(--accent);
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        /* ═══════ Password Generator ═══════ */
+        .generator-section {
+            margin-top: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+        }
+
+        .generator-section h3 {
+            font-family: var(--font-heading);
+            font-size: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gen-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .gen-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .gen-option input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 16px;
+            height: 16px;
+        }
+
+        .gen-option input[type="range"] {
+            accent-color: var(--accent);
+            width: 120px;
+        }
+
+        .gen-option .range-value {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-weight: 600;
+            min-width: 24px;
+        }
+
+        .gen-output {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .gen-output input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-family: var(--font-mono);
+            color: var(--accent);
+            outline: none;
+            letter-spacing: 1.5px;
+        }
+
+        .btn-generate,
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            font-family: var(--font-body);
+        }
+
+        .btn-generate:hover,
+        .btn-copy:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+        }
+
+        .btn-copy.copied {
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        /* ═══════ Export Button ═══════ */
+        .export-section {
+            display: none;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .export-section.active {
+            display: block;
+        }
+
+        .btn-export {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-body);
+        }
+
+        .btn-export:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        /* ═══════ Info Section ═══════ */
+        .info-section {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .info-section h3 {
+            font-family: var(--font-heading);
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .info-card h4 {
+            font-family: var(--font-heading);
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .info-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ═══════ Footer ═══════ */
+        footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* ═══════ Loading Spinner ═══════ */
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ═══════ Responsive ═══════ */
+        @media (max-width: 640px) {
+            .header {
+                padding: 16px 20px;
+            }
+
+            .header__nav {
+                display: none;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .toggle-visibility {
+                right: 12px;
+            }
+
+            .gen-output {
+                flex-direction: column;
+            }
+
+            .results.active {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ambient"></div>
+
+    <!-- ═══════ HEADER ═══════ -->
+    <header class="header">
+        <a href="../../" class="header__brand">
+            <div class="header__logo">D</div>
+            <div class="header__title">DEF Corp — Security Tools</div>
+        </a>
+        <nav class="header__nav">
+            <a href="../../">Home</a>
+            <a href="../../portfolio/">Portfolio</a>
+            <a href="../">All Tools</a>
+        </nav>
+    </header>
+
+    <!-- ═══════ MAIN CONTENT ═══════ -->
+    <main class="page">
+        <div class="page__header">
+            <div class="page__badge">
+                <span class="material-symbols-outlined" style="font-size:14px;">shield</span>
+                Cybersecurity Tool
+            </div>
+            <h1 class="page__title">Password <span>Security Analyzer</span></h1>
+            <p class="page__subtitle">Analyze your password strength, check for data breaches, and get actionable
+                security recommendations. Your password never leaves your browser.</p>
+        </div>
+
+        <!-- ═══════ PASSWORD INPUT ═══════ -->
+        <div class="input-section">
+            <div class="input-group">
+                <input type="password" id="passwordInput" placeholder="Enter a password to analyze..."
+                    autocomplete="off" spellcheck="false" />
+                <button class="toggle-visibility" id="toggleVisibility" aria-label="Toggle password visibility">
+                    <span class="material-symbols-outlined">visibility_off</span>
+                </button>
+                <button class="btn-analyze" id="analyzeBtn" onclick="analyzePassword()">
+                    <span class="material-symbols-outlined"
+                        style="font-size:18px;vertical-align:middle;margin-right:4px;">lock</span>
+                    Analyze
+                </button>
+            </div>
+
+            <!-- Strength Meter -->
+            <div class="strength-meter" id="strengthMeter">
+                <div class="meter-bar">
+                    <div class="meter-fill" id="meterFill"></div>
+                </div>
+                <div class="meter-label">
+                    <span class="meter-label__text" id="strengthText">—</span>
+                    <span class="meter-label__score" id="strengthScore">0 / 100</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ RESULTS GRID ═══════ -->
+        <div class="results" id="results">
+            <div class="result-card">
+                <div class="result-card__icon icon-time">
+                    <span class="material-symbols-outlined">timer</span>
+                </div>
+                <div class="result-card__title">Time to Crack</div>
+                <div class="result-card__value" id="timeToCrack">—</div>
+                <div class="result-card__detail" id="timeToCrackDetail">Estimated brute force duration</div>
+            </div>
+            <div class="result-card">
+                <div class="result-card__icon icon-entropy">
+                    <span class="material-symbols-outlined">calculate</span>
+                </div>
+                <div class="result-card__title">Entropy</div>
+                <div class="result-card__value" id="entropy">—</div>
+                <div class="result-card__detail" id="entropyDetail">Higher entropy = more secure</div>
+            </div>
+            <div class="result-card">
+                <div class="result-card__icon icon-breach">
+                    <span class="material-symbols-outlined">gpp_maybe</span>
+                </div>
+                <div class="result-card__title">Data Breaches</div>
+                <div class="result-card__value" id="breachStatus">—</div>
+                <div class="result-card__detail" id="breachDetail">Checked via HaveIBeenPwned</div>
+            </div>
+            <div class="result-card">
+                <div class="result-card__icon icon-common">
+                    <span class="material-symbols-outlined">warning</span>
+                </div>
+                <div class="result-card__title">Common Password</div>
+                <div class="result-card__value" id="commonStatus">—</div>
+                <div class="result-card__detail" id="commonDetail">Checked against known lists</div>
+            </div>
+        </div>
+
+        <!-- ═══════ DETAILED ANALYSIS ═══════ -->
+        <div class="analysis-section" id="analysisSection">
+            <div class="analysis-card">
+                <h3>
+                    <span class="material-symbols-outlined" style="color:var(--accent);">checklist</span>
+                    Security Checklist
+                </h3>
+                <ul class="checklist" id="checklist"></ul>
+            </div>
+        </div>
+
+        <!-- ═══════ RECOMMENDATIONS ═══════ -->
+        <div class="recommendations" id="recommendations">
+            <div class="rec-card">
+                <h3>
+                    <span class="material-symbols-outlined" style="color:var(--accent-2);">lightbulb</span>
+                    Recommendations
+                </h3>
+                <ul class="rec-list" id="recList"></ul>
+            </div>
+        </div>
+
+        <!-- ═══════ EXPORT ═══════ -->
+        <div class="export-section" id="exportSection">
+            <button class="btn-export" onclick="exportReport()">
+                <span class="material-symbols-outlined" style="font-size:18px;">download</span>
+                Export Security Report
+            </button>
+        </div>
+
+        <!-- ═══════ PASSWORD GENERATOR ═══════ -->
+        <div class="generator-section">
+            <h3>
+                <span class="material-symbols-outlined" style="color:var(--accent);">passkey</span>
+                Secure Password Generator
+            </h3>
+            <div class="gen-options">
+                <label class="gen-option">
+                    <input type="range" id="genLength" min="8" max="64" value="20"
+                        oninput="document.getElementById('lenValue').textContent=this.value">
+                    Length: <span class="range-value" id="lenValue">20</span>
+                </label>
+                <label class="gen-option">
+                    <input type="checkbox" id="genUpper" checked> Uppercase
+                </label>
+                <label class="gen-option">
+                    <input type="checkbox" id="genLower" checked> Lowercase
+                </label>
+                <label class="gen-option">
+                    <input type="checkbox" id="genNumbers" checked> Numbers
+                </label>
+                <label class="gen-option">
+                    <input type="checkbox" id="genSymbols" checked> Symbols
+                </label>
+            </div>
+            <div class="gen-output">
+                <input type="text" id="genOutput" readonly placeholder="Click Generate..." />
+                <button class="btn-generate" onclick="generatePassword()">
+                    <span class="material-symbols-outlined" style="font-size:18px;">autorenew</span> Generate
+                </button>
+                <button class="btn-copy" id="copyBtn" onclick="copyPassword()">
+                    <span class="material-symbols-outlined" style="font-size:18px;">content_copy</span> Copy
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══════ INFO SECTION ═══════ -->
+        <div class="info-section">
+            <h3>🔐 How It Works</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Entropy Calculation</h4>
+                    <p>Entropy measures the randomness of your password in bits. It's calculated as: log₂(charset_size ^
+                        length). A password with 60+ bits of entropy is considered strong.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Brute Force Estimation</h4>
+                    <p>We estimate crack time assuming 10 billion guesses/second (modern GPU cluster). This covers
+                        offline hash cracking scenarios like MD5 or SHA-1.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Breach Check (k-Anonymity)</h4>
+                    <p>We use the HaveIBeenPwned API with k-anonymity — only the first 5 characters of the SHA-1 hash
+                        are sent. Your full password is never transmitted.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <a href="../../portfolio/">Alexandru Glonț</a> · DEF Corp © 2026 · Built with precision
+    </footer>
+
+    <!-- ═══════════════════════════════════════════════
+         JAVASCRIPT — Password Analysis Engine
+    ═══════════════════════════════════════════════ -->
+    <script>
+        // ──────────────────────────────────────────────
+        // 🎓 CONCEPT: Common Passwords List
+        // In cybersecurity, attackers use "dictionary attacks" — they try the most
+        // common passwords first. This list represents the top passwords that appear
+        // in data breaches. If your password is on this list, it can be cracked
+        // in milliseconds, regardless of its length.
+        // ──────────────────────────────────────────────
+        const COMMON_PASSWORDS = new Set([
+            'password', '123456', '12345678', 'qwerty', 'abc123', 'monkey', 'master',
+            'dragon', '111111', 'baseball', 'iloveyou', 'trustno1', 'sunshine',
+            'princess', 'football', 'charlie', 'shadow', 'michael', 'password1',
+            'ashley', 'bailey', 'passw0rd', 'superman', 'letmein', 'admin', 'welcome',
+            '123456789', '1234567890', '12345', '1234567', 'login', 'starwars',
+            'solo', 'master', 'hello', 'charlie', 'donald', 'jordan', 'access',
+            'flower', 'hottie', 'loveme', 'zaq1zaq1', 'password123', 'qwerty123',
+            'aa123456', '1q2w3e4r', 'qwertyuiop', '654321', '555555', 'lovely',
+            '7777777', 'welcome1', 'michael1', 'jessica', 'whatever', '1qaz2wsx',
+            'nike', 'merlin', 'wowserverps', 'snickers', 'ginger', 'abcdefgh',
+            'test', 'minecraft', 'cheese', 'computer', 'corvette', 'freedom',
+            'thunderbird', 'williams', 'creative', 'bubbles', 'daniel', 'matrix'
+        ]);
+
+        // ──────────────────────────────────────────────
+        // 🎓 CONCEPT: Character Set Size (Charset)
+        // The "charset" is the pool of characters a password could use.
+        // More character types = larger pool = exponentially harder to crack.
+        //
+        // Lowercase only:    26 characters
+        // + Uppercase:        52 characters
+        // + Numbers:          62 characters
+        // + Symbols:          95 characters
+        //
+        // A 8-char password with only lowercase: 26^8 = 208 billion combos
+        // A 8-char password with all types:      95^8 = 6.6 quadrillion combos
+        // ──────────────────────────────────────────────
+        function getCharsetSize(password) {
+            let size = 0;
+            if (/[a-z]/.test(password)) size += 26;
+            if (/[A-Z]/.test(password)) size += 26;
+            if (/[0-9]/.test(password)) size += 10;
+            if (/[^a-zA-Z0-9]/.test(password)) size += 33;
+            return size;
+        }
+
+        // ──────────────────────────────────────────────
+        // 🎓 CONCEPT: Entropy (measured in bits)
+        // Entropy = log2(charset_size ^ length)
+        //         = length * log2(charset_size)
+        //
+        // This tells us how many "bits" of randomness the password has.
+        // Think of it like this: X bits of entropy means an attacker
+        // needs to try 2^X combinations on average to crack it.
+        //
+        // < 28 bits:  Very Weak (trivial to crack)
+        // 28-35 bits: Weak
+        // 36-59 bits: Fair
+        // 60-127 bits: Strong
+        // 128+ bits:  Excellent (practically uncrackable)
+        // ──────────────────────────────────────────────
+        function calculateEntropy(password) {
+            const charsetSize = getCharsetSize(password);
+            if (charsetSize === 0) return 0;
+            return Math.round(password.length * Math.log2(charsetSize) * 100) / 100;
+        }
+
+        // ──────────────────────────────────────────────
+        // 🎓 CONCEPT: Brute Force Time Estimation
+        // We assume an attacker can try 10 billion (10^10) passwords per second.
+        // This is realistic for offline attacks using GPU clusters (e.g., Hashcat).
+        //
+        // Total combinations = charset_size ^ length
+        // Seconds to crack = combinations / guesses_per_second
+        //
+        // We then convert seconds into human-readable format.
+        // ──────────────────────────────────────────────
+        function estimateCrackTime(password) {
+            const charsetSize = getCharsetSize(password);
+            const combinations = Math.pow(charsetSize, password.length);
+            const guessesPerSecond = 10_000_000_000; // 10 billion (GPU cluster)
+            const seconds = combinations / guessesPerSecond;
+
+            if (seconds < 0.001) return { text: 'Instantly', detail: 'Less than a millisecond' };
+            if (seconds < 1) return { text: '< 1 second', detail: `${Math.round(seconds * 1000)} milliseconds` };
+            if (seconds < 60) return { text: `${Math.round(seconds)} seconds`, detail: 'Very fast to crack' };
+            if (seconds < 3600) return { text: `${Math.round(seconds / 60)} minutes`, detail: 'Crackable in short time' };
+            if (seconds < 86400) return { text: `${Math.round(seconds / 3600)} hours`, detail: 'Vulnerable to dedicated attacks' };
+            if (seconds < 86400 * 365) return { text: `${Math.round(seconds / 86400)} days`, detail: 'Moderate resistance' };
+            if (seconds < 86400 * 365 * 100) return { text: `${Math.round(seconds / (86400 * 365))} years`, detail: 'Good resistance' };
+            if (seconds < 86400 * 365 * 1e6) return { text: `${Math.round(seconds / (86400 * 365))} years`, detail: 'Very strong resistance' };
+            if (seconds < 86400 * 365 * 1e9) return { text: `${(seconds / (86400 * 365 * 1e6)).toFixed(1)}M years`, detail: 'Practically uncrackable' };
+            return { text: '∞ Centuries', detail: 'Beyond computational reach' };
+        }
+
+        // ──────────────────────────────────────────────
+        // 🎓 CONCEPT: Strength Scoring
+        // We combine multiple factors into a single 0-100 score:
+        // - Length (longer = better)
+        // - Character variety (more types = better)
+        // - Entropy (mathematical randomness)
+        // - Penalty for common patterns
+        // ──────────────────────────────────────────────
+        function calculateStrengthScore(password) {
+            let score = 0;
+            const len = password.length;
+            const entropy = calculateEntropy(password);
+
+            // Length scoring (max 30 points)
+            score += Math.min(30, len * 2.5);
+
+            // Character variety (max 25 points)
+            if (/[a-z]/.test(password)) score += 5;
+            if (/[A-Z]/.test(password)) score += 7;
+            if (/[0-9]/.test(password)) score += 6;
+            if (/[^a-zA-Z0-9]/.test(password)) score += 7;
+
+            // Entropy bonus (max 30 points)
+            score += Math.min(30, entropy * 0.4);
+
+            // Penalties
+            if (COMMON_PASSWORDS.has(password.toLowerCase())) score = Math.min(score, 5);
+            if (/^(.)\1+$/.test(password)) score = Math.min(score, 3); // all same char
+            if (/^(012|123|234|345|456|567|678|789)/.test(password)) score -= 10;
+            if (/^(abc|bcd|cde|def|efg|qwerty)/i.test(password)) score -= 10;
+
+            return Math.max(0, Math.min(100, Math.round(score)));
+        }
+
+        function getStrengthLabel(score) {
+            if (score < 20) return { label: 'Critical', color: 'var(--color-critical)' };
+            if (score < 40) return { label: 'Weak', color: 'var(--color-weak)' };
+            if (score < 60) return { label: 'Fair', color: 'var(--color-fair)' };
+            if (score < 80) return { label: 'Strong', color: 'var(--color-strong)' };
+            return { label: 'Excellent', color: 'var(--color-excellent)' };
+        }
+
+        // ──────────────────────────────────────────────
+        // 🎓 CONCEPT: k-Anonymity (HaveIBeenPwned API)
+        // Instead of sending your full password to check for breaches,
+        // we use a clever technique called k-anonymity:
+        //
+        // 1. Hash the password with SHA-1
+        // 2. Send only the first 5 characters of the hash
+        // 3. The API returns all hashes that START with those 5 chars
+        // 4. We check locally if our full hash is in the results
+        //
+        // This way, the API never knows your actual password.
+        // ──────────────────────────────────────────────
+        async function checkBreach(password) {
+            try {
+                // Step 1: Create SHA-1 hash of the password
+                const encoder = new TextEncoder();
+                const data = encoder.encode(password);
+                const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+
+                // Step 2: Convert hash to hex string
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+
+                // Step 3: Split hash — first 5 chars (prefix) and the rest (suffix)
+                const prefix = hashHex.substring(0, 5);
+                const suffix = hashHex.substring(5);
+
+                // Step 4: Query the API with only the prefix
+                const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+                const text = await response.text();
+
+                // Step 5: Check if our suffix appears in the results
+                const lines = text.split('\n');
+                for (const line of lines) {
+                    const [hash, count] = line.split(':');
+                    if (hash.trim() === suffix) {
+                        return { breached: true, count: parseInt(count.trim()) };
+                    }
+                }
+                return { breached: false, count: 0 };
+            } catch (error) {
+                return { breached: null, count: 0, error: 'Unable to check' };
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        // Security Checklist Generator
+        // ──────────────────────────────────────────────
+        function generateChecklist(password) {
+            const checks = [
+                { test: password.length >= 8, label: 'At least 8 characters', warn: password.length >= 6 && password.length < 8 },
+                { test: password.length >= 12, label: 'At least 12 characters (recommended)' },
+                { test: /[a-z]/.test(password), label: 'Contains lowercase letters' },
+                { test: /[A-Z]/.test(password), label: 'Contains uppercase letters' },
+                { test: /[0-9]/.test(password), label: 'Contains numbers' },
+                { test: /[^a-zA-Z0-9]/.test(password), label: 'Contains special characters (!@#$...)' },
+                { test: !COMMON_PASSWORDS.has(password.toLowerCase()), label: 'Not a commonly used password' },
+                { test: !/(.)\1{2,}/.test(password), label: 'No repeated characters (aaa, 111)' },
+                { test: !/^(012|123|234|345|456|567|678|789|abc|bcd|qwe)/i.test(password), label: 'No sequential patterns' },
+                { test: password.length >= 16, label: '16+ characters (maximum security)' },
+            ];
+            return checks;
+        }
+
+        // ──────────────────────────────────────────────
+        // Recommendation Generator
+        // ──────────────────────────────────────────────
+        function generateRecommendations(password, score, breachResult) {
+            const recs = [];
+
+            if (password.length < 12) {
+                recs.push('Increase password length to at least 12 characters. Each additional character exponentially increases security.');
+            }
+            if (!/[A-Z]/.test(password)) {
+                recs.push('Add uppercase letters to increase the character pool size from 26 to 52.');
+            }
+            if (!/[0-9]/.test(password)) {
+                recs.push('Include numbers to expand the character set and resist dictionary attacks.');
+            }
+            if (!/[^a-zA-Z0-9]/.test(password)) {
+                recs.push('Add special characters (!@#$%^&*) — this increases the charset to 95 possible characters per position.');
+            }
+            if (COMMON_PASSWORDS.has(password.toLowerCase())) {
+                recs.push('⚠️ This is a widely known password. Change it immediately — it can be cracked in milliseconds.');
+            }
+            if (breachResult && breachResult.breached) {
+                recs.push(`⚠️ This password appeared in ${breachResult.count.toLocaleString()} data breaches. Never reuse it.`);
+            }
+            if (/(.)\1{2,}/.test(password)) {
+                recs.push('Avoid repeating the same character multiple times (e.g., "aaa" or "111").');
+            }
+            if (score >= 80) {
+                recs.push('✅ Strong password! Consider using a password manager to store it securely.');
+            }
+            recs.push('Use a unique password for every account. Never reuse passwords across services.');
+            recs.push('Enable Two-Factor Authentication (2FA) wherever possible for an extra layer of security.');
+
+            return recs;
+        }
+
+        // ──────────────────────────────────────────────
+        // Main Analyze Function
+        // ──────────────────────────────────────────────
+        async function analyzePassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (!password) return;
+
+            // Show results
+            document.getElementById('strengthMeter').classList.add('active');
+            document.getElementById('results').classList.add('active');
+            document.getElementById('analysisSection').classList.add('active');
+            document.getElementById('recommendations').classList.add('active');
+            document.getElementById('exportSection').classList.add('active');
+
+            // Calculate strength
+            const score = calculateStrengthScore(password);
+            const strength = getStrengthLabel(score);
+            const entropy = calculateEntropy(password);
+            const crackTime = estimateCrackTime(password);
+            const isCommon = COMMON_PASSWORDS.has(password.toLowerCase());
+
+            // Update strength meter
+            const meterFill = document.getElementById('meterFill');
+            meterFill.style.width = score + '%';
+            meterFill.style.background = strength.color;
+            document.getElementById('strengthText').textContent = strength.label;
+            document.getElementById('strengthText').style.color = strength.color;
+            document.getElementById('strengthScore').textContent = `${score} / 100`;
+
+            // Update result cards
+            document.getElementById('timeToCrack').textContent = crackTime.text;
+            document.getElementById('timeToCrackDetail').textContent = crackTime.detail;
+
+            document.getElementById('entropy').textContent = `${entropy} bits`;
+            document.getElementById('entropyDetail').textContent =
+                entropy < 28 ? 'Very low — easily guessable' :
+                    entropy < 36 ? 'Low — vulnerable to attacks' :
+                        entropy < 60 ? 'Moderate — could be improved' :
+                            entropy < 128 ? 'High — good security' : 'Excellent — maximum security';
+
+            document.getElementById('commonStatus').textContent = isCommon ? '⚠️ Found' : '✅ Clean';
+            document.getElementById('commonStatus').style.color = isCommon ? 'var(--color-critical)' : 'var(--color-strong)';
+            document.getElementById('commonDetail').textContent = isCommon
+                ? 'This password is in the top common passwords list'
+                : 'Not found in common password lists';
+
+            // Check breach (async)
+            document.getElementById('breachStatus').textContent = '...';
+            document.getElementById('breachDetail').innerHTML = '<span class="loading"><span class="spinner"></span> Checking HaveIBeenPwned...</span>';
+
+            const breachResult = await checkBreach(password);
+            if (breachResult.breached === null) {
+                document.getElementById('breachStatus').textContent = '⚠️ Error';
+                document.getElementById('breachDetail').textContent = 'Could not connect to breach database';
+            } else if (breachResult.breached) {
+                document.getElementById('breachStatus').textContent = `⚠️ ${breachResult.count.toLocaleString()}×`;
+                document.getElementById('breachStatus').style.color = 'var(--color-critical)';
+                document.getElementById('breachDetail').textContent = `Found in ${breachResult.count.toLocaleString()} data breaches`;
+            } else {
+                document.getElementById('breachStatus').textContent = '✅ Clean';
+                document.getElementById('breachStatus').style.color = 'var(--color-strong)';
+                document.getElementById('breachDetail').textContent = 'Not found in any known data breaches';
+            }
+
+            // Generate checklist
+            const checks = generateChecklist(password);
+            const checklistEl = document.getElementById('checklist');
+            checklistEl.innerHTML = checks.map(c => `
+                <li>
+                    <span class="check-icon ${c.test ? 'check-pass' : c.warn ? 'check-warn' : 'check-fail'}">
+                        <span class="material-symbols-outlined" style="font-size:14px;">
+                            ${c.test ? 'check' : c.warn ? 'remove' : 'close'}
+                        </span>
+                    </span>
+                    ${c.label}
+                </li>
+            `).join('');
+
+            // Generate recommendations
+            const recs = generateRecommendations(password, score, breachResult);
+            const recListEl = document.getElementById('recList');
+            recListEl.innerHTML = recs.map(r => `
+                <li>
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                    ${r}
+                </li>
+            `).join('');
+
+            // Store for export
+            window._lastAnalysis = { password: '***', score, strength, entropy, crackTime, isCommon, breachResult, checks, recs };
+        }
+
+        // ──────────────────────────────────────────────
+        // Password Generator
+        // ──────────────────────────────────────────────
+        function generatePassword() {
+            const length = parseInt(document.getElementById('genLength').value);
+            const useUpper = document.getElementById('genUpper').checked;
+            const useLower = document.getElementById('genLower').checked;
+            const useNumbers = document.getElementById('genNumbers').checked;
+            const useSymbols = document.getElementById('genSymbols').checked;
+
+            let charset = '';
+            if (useLower) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (useUpper) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (useNumbers) charset += '0123456789';
+            if (useSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+            if (!charset) {
+                charset = 'abcdefghijklmnopqrstuvwxyz';
+            }
+
+            // 🎓 CONCEPT: Cryptographically Secure Random
+            // We use crypto.getRandomValues() instead of Math.random()
+            // because Math.random() is NOT cryptographically secure —
+            // it uses a predictable algorithm. crypto.getRandomValues()
+            // uses the OS's secure random number generator.
+            const array = new Uint32Array(length);
+            crypto.getRandomValues(array);
+
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += charset[array[i] % charset.length];
+            }
+
+            document.getElementById('genOutput').value = password;
+        }
+
+        function copyPassword() {
+            const output = document.getElementById('genOutput');
+            if (!output.value) return;
+
+            navigator.clipboard.writeText(output.value);
+            const btn = document.getElementById('copyBtn');
+            btn.classList.add('copied');
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">check</span> Copied!';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">content_copy</span> Copy';
+            }, 2000);
+        }
+
+        // ──────────────────────────────────────────────
+        // Toggle Password Visibility
+        // ──────────────────────────────────────────────
+        document.getElementById('toggleVisibility').addEventListener('click', function () {
+            const input = document.getElementById('passwordInput');
+            const icon = this.querySelector('.material-symbols-outlined');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
+        });
+
+        // Enter key triggers analysis
+        document.getElementById('passwordInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') analyzePassword();
+        });
+
+        // ──────────────────────────────────────────────
+        // Export Report as Text File
+        // ──────────────────────────────────────────────
+        function exportReport() {
+            const a = window._lastAnalysis;
+            if (!a) return;
+
+            const report = `
+═══════════════════════════════════════════════
+ PASSWORD SECURITY REPORT
+ Generated by DEF Corp Password Analyzer
+ Date: ${new Date().toLocaleString()}
+═══════════════════════════════════════════════
+
+STRENGTH SCORE:  ${a.score} / 100 (${a.strength.label})
+ENTROPY:         ${a.entropy} bits
+TIME TO CRACK:   ${a.crackTime.text}
+COMMON PASSWORD: ${a.isCommon ? 'YES ⚠️' : 'No ✅'}
+DATA BREACHES:   ${a.breachResult.breached ? `Found in ${a.breachResult.count.toLocaleString()} breaches ⚠️` : a.breachResult.breached === false ? 'Not found ✅' : 'Unable to check'}
+
+───────────────────────────────────────────────
+ SECURITY CHECKLIST
+───────────────────────────────────────────────
+${a.checks.map(c => `[${c.test ? '✓' : '✗'}] ${c.label}`).join('\n')}
+
+───────────────────────────────────────────────
+ RECOMMENDATIONS
+───────────────────────────────────────────────
+${a.recs.map((r, i) => `${i + 1}. ${r}`).join('\n')}
+
+═══════════════════════════════════════════════
+ This report was generated by DEF Corp
+ https://defcorp.xyz/tools/password-analyzer
+═══════════════════════════════════════════════
+`.trim();
+
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `password-security-report-${Date.now()}.txt`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-generate a password on load
+        generatePassword();
+    </script>
+</body>
+
+</html>
