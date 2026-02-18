@@ -995,20 +995,106 @@
         // in data breaches. If your password is on this list, it can be cracked
         // in milliseconds, regardless of its length.
         // ──────────────────────────────────────────────
+        // ──────────────────────────────────────────────
+        // 🎓 CONCEPT: Common Passwords & Dictionary Words
+        // Attackers use "dictionary attacks" — they try common passwords and
+        // dictionary words (with variations like "password123", "P@ssw0rd") first.
+        // A smart analyzer must detect the BASE WORD inside the password,
+        // not just exact matches. "password1234" is just as weak as "password".
+        // ──────────────────────────────────────────────
         const COMMON_PASSWORDS = new Set([
             'password', '123456', '12345678', 'qwerty', 'abc123', 'monkey', 'master',
             'dragon', '111111', 'baseball', 'iloveyou', 'trustno1', 'sunshine',
             'princess', 'football', 'charlie', 'shadow', 'michael', 'password1',
             'ashley', 'bailey', 'passw0rd', 'superman', 'letmein', 'admin', 'welcome',
             '123456789', '1234567890', '12345', '1234567', 'login', 'starwars',
-            'solo', 'master', 'hello', 'charlie', 'donald', 'jordan', 'access',
-            'flower', 'hottie', 'loveme', 'zaq1zaq1', 'password123', 'qwerty123',
+            'solo', 'hello', 'donald', 'jordan', 'access', 'password123', 'password1234',
+            'flower', 'hottie', 'loveme', 'zaq1zaq1', 'qwerty123',
             'aa123456', '1q2w3e4r', 'qwertyuiop', '654321', '555555', 'lovely',
             '7777777', 'welcome1', 'michael1', 'jessica', 'whatever', '1qaz2wsx',
-            'nike', 'merlin', 'wowserverps', 'snickers', 'ginger', 'abcdefgh',
+            'nike', 'merlin', 'snickers', 'ginger', 'abcdefgh', 'abcdef',
             'test', 'minecraft', 'cheese', 'computer', 'corvette', 'freedom',
-            'thunderbird', 'williams', 'creative', 'bubbles', 'daniel', 'matrix'
+            'thunderbird', 'williams', 'creative', 'bubbles', 'daniel', 'matrix',
+            'admin123', 'root', 'toor', 'changeme', 'guest', 'default', 'test123'
         ]);
+
+        // 🎓 CONCEPT: Dictionary Word Detection
+        // Real attackers don't just try exact passwords — they try base words
+        // with numbers/symbols appended. "password", "password1", "password123",
+        // "password!", "Password1!" are ALL weak because the base is predictable.
+        const COMMON_WORDS = [
+            'password', 'admin', 'user', 'login', 'welcome', 'master', 'hello',
+            'dragon', 'monkey', 'shadow', 'sunshine', 'princess', 'football',
+            'baseball', 'soccer', 'hockey', 'batman', 'superman', 'spider',
+            'charlie', 'thomas', 'michael', 'jessica', 'jordan', 'hunter',
+            'ranger', 'harley', 'george', 'daniel', 'robert', 'andrew',
+            'qwerty', 'letmein', 'access', 'mustang', 'corvette', 'freedom',
+            'iloveyou', 'trustno', 'computer', 'minecraft', 'starwars', 'matrix',
+            'cheese', 'ginger', 'flower', 'cookie', 'summer', 'winter',
+            'spring', 'secret', 'test', 'guest', 'default', 'changeme'
+        ];
+
+        // 🎓 CONCEPT: Leet Speak Detection
+        // "P@ssw0rd" looks complex but attackers know about leet speak
+        // substitutions (a→@, e→3, o→0, etc.) and test them automatically.
+        function deLeet(str) {
+            return str.toLowerCase()
+                .replace(/@/g, 'a').replace(/4/g, 'a')
+                .replace(/3/g, 'e').replace(/€/g, 'e')
+                .replace(/1/g, 'i').replace(/!/g, 'i')
+                .replace(/0/g, 'o')
+                .replace(/\$/g, 's').replace(/5/g, 's')
+                .replace(/7/g, 't').replace(/\+/g, 't');
+        }
+
+        // Check if password is based on a dictionary word
+        function containsCommonWord(password) {
+            const lower = password.toLowerCase();
+            const deleeted = deLeet(password);
+            // Strip trailing/leading numbers and symbols to find the base word
+            const stripped = lower.replace(/^[^a-z]+/, '').replace(/[^a-z]+$/, '');
+            const strippedLeet = deleeted.replace(/^[^a-z]+/, '').replace(/[^a-z]+$/, '');
+
+            for (const word of COMMON_WORDS) {
+                if (word.length < 4) continue; // skip very short words
+                if (lower.includes(word) || deleeted.includes(word)) return word;
+                if (stripped === word || strippedLeet === word) return word;
+            }
+            return null;
+        }
+
+        // 🎓 CONCEPT: Sequential & Repeated Pattern Detection
+        function hasSequentialChars(password, minLen = 3) {
+            const lower = password.toLowerCase();
+            let ascending = 1, descending = 1;
+            for (let i = 1; i < lower.length; i++) {
+                const diff = lower.charCodeAt(i) - lower.charCodeAt(i - 1);
+                ascending = (diff === 1) ? ascending + 1 : 1;
+                descending = (diff === -1) ? descending + 1 : 1;
+                if (ascending >= minLen || descending >= minLen) return true;
+            }
+            return false;
+        }
+
+        function hasRepeatedChars(password, minLen = 3) {
+            for (let i = 2; i < password.length; i++) {
+                if (password[i] === password[i - 1] && password[i] === password[i - 2]) return true;
+            }
+            return false;
+        }
+
+        // Keyboard walk detection (qwerty, asdf, zxcv, etc.)
+        const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm', '1234567890'];
+        function hasKeyboardWalk(password, minLen = 4) {
+            const lower = password.toLowerCase();
+            for (const row of KEYBOARD_ROWS) {
+                for (let start = 0; start <= row.length - minLen; start++) {
+                    const chunk = row.substring(start, start + minLen);
+                    if (lower.includes(chunk)) return true;
+                }
+            }
+            return false;
+        }
 
         // ──────────────────────────────────────────────
         // 🎓 CONCEPT: Character Set Size (Charset)
@@ -1055,18 +1141,32 @@
 
         // ──────────────────────────────────────────────
         // 🎓 CONCEPT: Brute Force Time Estimation
-        // We assume an attacker can try 10 billion (10^10) passwords per second.
-        // This is realistic for offline attacks using GPU clusters (e.g., Hashcat).
+        // Assumes 10 billion guesses/second (GPU cluster with Hashcat).
         //
-        // Total combinations = charset_size ^ length
-        // Seconds to crack = combinations / guesses_per_second
-        //
-        // We then convert seconds into human-readable format.
+        // BUT — for dictionary-based passwords, attackers don't brute force.
+        // They use wordlists + rules, so we adjust time estimation downward
+        // when common words are detected.
         // ──────────────────────────────────────────────
         function estimateCrackTime(password) {
             const charsetSize = getCharsetSize(password);
-            const combinations = Math.pow(charsetSize, password.length);
+            let combinations = Math.pow(charsetSize, password.length);
             const guessesPerSecond = 10_000_000_000; // 10 billion (GPU cluster)
+
+            // 🎓 CONCEPT: Dictionary Attack Speed
+            // If the password contains a common word, attackers use wordlists
+            // (not brute force). A wordlist of 10M words × common rules
+            // (append numbers, leet speak) = ~1 billion combos max.
+            // This means dictionary passwords crack in SECONDS, not years.
+            const foundWord = containsCommonWord(password);
+            if (foundWord) {
+                // Dictionary attack: ~10M base words × 10K rules = 100B combos max
+                combinations = Math.min(combinations, 100_000_000_000);
+            }
+
+            if (COMMON_PASSWORDS.has(password.toLowerCase())) {
+                combinations = 1; // Instant — it's literally in the list
+            }
+
             const seconds = combinations / guessesPerSecond;
 
             if (seconds < 0.001) return { text: 'Instantly', detail: 'Less than a millisecond' };
@@ -1082,35 +1182,92 @@
         }
 
         // ──────────────────────────────────────────────
-        // 🎓 CONCEPT: Strength Scoring
-        // We combine multiple factors into a single 0-100 score:
-        // - Length (longer = better)
-        // - Character variety (more types = better)
-        // - Entropy (mathematical randomness)
-        // - Penalty for common patterns
+        // 🎓 CONCEPT: Strength Scoring (IMPROVED)
+        // A realistic scorer must penalize patterns that attackers exploit:
+        // 1. Dictionary words as base (password123 ≈ password)
+        // 2. Sequential chars (abc, 123, qwerty)
+        // 3. Repeated chars (aaa, 111)
+        // 4. Leet speak (P@ssw0rd ≈ password)
+        // 5. Only numbers (even long ones are weak)
+        // 6. Keyboard walks (qwerty, asdf)
+        //
+        // A password is STRONG only if it's both LONG and RANDOM.
         // ──────────────────────────────────────────────
         function calculateStrengthScore(password) {
             let score = 0;
             const len = password.length;
             const entropy = calculateEntropy(password);
 
-            // Length scoring (max 30 points)
-            score += Math.min(30, len * 2.5);
+            // ── Base score from length (max 25 pts) ──
+            // But with diminishing returns — length alone doesn't help
+            if (len >= 8) score += 10;
+            if (len >= 12) score += 8;
+            if (len >= 16) score += 5;
+            if (len >= 20) score += 2;
 
-            // Character variety (max 25 points)
-            if (/[a-z]/.test(password)) score += 5;
-            if (/[A-Z]/.test(password)) score += 7;
-            if (/[0-9]/.test(password)) score += 6;
-            if (/[^a-zA-Z0-9]/.test(password)) score += 7;
+            // ── Character variety (max 20 pts) ──
+            let charTypes = 0;
+            if (/[a-z]/.test(password)) { score += 3; charTypes++; }
+            if (/[A-Z]/.test(password)) { score += 5; charTypes++; }
+            if (/[0-9]/.test(password)) { score += 5; charTypes++; }
+            if (/[^a-zA-Z0-9]/.test(password)) { score += 7; charTypes++; }
 
-            // Entropy bonus (max 30 points)
-            score += Math.min(30, entropy * 0.4);
+            // ── Entropy bonus (max 25 pts) ──
+            // Only kicks in meaningfully for truly random passwords
+            if (entropy >= 40) score += 5;
+            if (entropy >= 60) score += 8;
+            if (entropy >= 80) score += 7;
+            if (entropy >= 100) score += 5;
 
-            // Penalties
-            if (COMMON_PASSWORDS.has(password.toLowerCase())) score = Math.min(score, 5);
-            if (/^(.)\1+$/.test(password)) score = Math.min(score, 3); // all same char
-            if (/^(012|123|234|345|456|567|678|789)/.test(password)) score -= 10;
-            if (/^(abc|bcd|cde|def|efg|qwerty)/i.test(password)) score -= 10;
+            // ── Bonus for mixed placement (max 10 pts) ──
+            // Numbers/symbols in the MIDDLE (not just appended) is better
+            const middle = password.substring(1, password.length - 1);
+            if (/[0-9]/.test(middle) && /[a-zA-Z]/.test(middle)) score += 5;
+            if (/[^a-zA-Z0-9]/.test(middle)) score += 5;
+
+            // ══════ PENALTIES ══════
+
+            // Exact match in common passwords list → cap at 5
+            if (COMMON_PASSWORDS.has(password.toLowerCase())) {
+                score = Math.min(score, 5);
+            }
+
+            // Contains a dictionary word as base → severe penalty
+            const foundWord = containsCommonWord(password);
+            if (foundWord) {
+                // The password is built on a predictable base word
+                // "password1234" → base is "password" → most of the "complexity" is fake
+                const wordRatio = foundWord.length / password.length;
+                if (wordRatio > 0.5) {
+                    // Word makes up more than half → very weak
+                    score = Math.min(score, 15);
+                } else {
+                    // Word is a smaller part → moderate penalty
+                    score -= 20;
+                }
+            }
+
+            // All same character → cap at 3
+            if (/^(.)\1+$/.test(password)) score = Math.min(score, 3);
+
+            // Sequential characters anywhere (abc, 123, 789) → penalty
+            if (hasSequentialChars(password, 3)) score -= 15;
+
+            // Keyboard walks (qwerty, asdf, etc.) → penalty
+            if (hasKeyboardWalk(password, 4)) score -= 15;
+
+            // Repeated characters (aaa, 111) → penalty
+            if (hasRepeatedChars(password)) score -= 10;
+
+            // Only digits → cap score (even "9379372649184" is weak to number-only brute force)
+            if (/^\d+$/.test(password)) score = Math.min(score, 20);
+
+            // Only lowercase → cap score
+            if (/^[a-z]+$/.test(password)) score = Math.min(score, 25);
+
+            // Too short → hard cap
+            if (len < 6) score = Math.min(score, 10);
+            if (len < 8) score = Math.min(score, 25);
 
             return Math.max(0, Math.min(100, Math.round(score)));
         }
@@ -1172,6 +1329,7 @@
         // Security Checklist Generator
         // ──────────────────────────────────────────────
         function generateChecklist(password) {
+            const foundWord = containsCommonWord(password);
             const checks = [
                 { test: password.length >= 8, label: 'At least 8 characters', warn: password.length >= 6 && password.length < 8 },
                 { test: password.length >= 12, label: 'At least 12 characters (recommended)' },
@@ -1180,8 +1338,10 @@
                 { test: /[0-9]/.test(password), label: 'Contains numbers' },
                 { test: /[^a-zA-Z0-9]/.test(password), label: 'Contains special characters (!@#$...)' },
                 { test: !COMMON_PASSWORDS.has(password.toLowerCase()), label: 'Not a commonly used password' },
-                { test: !/(.)\1{2,}/.test(password), label: 'No repeated characters (aaa, 111)' },
-                { test: !/^(012|123|234|345|456|567|678|789|abc|bcd|qwe)/i.test(password), label: 'No sequential patterns' },
+                { test: !foundWord, label: `Not based on a dictionary word${foundWord ? ' (detected: "' + foundWord + '")' : ''}` },
+                { test: !hasRepeatedChars(password), label: 'No repeated characters (aaa, 111)' },
+                { test: !hasSequentialChars(password), label: 'No sequential patterns (abc, 123)' },
+                { test: !hasKeyboardWalk(password), label: 'No keyboard walks (qwerty, asdf)' },
                 { test: password.length >= 16, label: '16+ characters (maximum security)' },
             ];
             return checks;
@@ -1192,7 +1352,11 @@
         // ──────────────────────────────────────────────
         function generateRecommendations(password, score, breachResult) {
             const recs = [];
+            const foundWord = containsCommonWord(password);
 
+            if (foundWord) {
+                recs.push(`⚠️ Your password is based on the dictionary word "${foundWord}". Attackers try these first with common variations (${foundWord}123, ${foundWord}!, etc.). Use a completely random password instead.`);
+            }
             if (password.length < 12) {
                 recs.push('Increase password length to at least 12 characters. Each additional character exponentially increases security.');
             }
@@ -1211,8 +1375,17 @@
             if (breachResult && breachResult.breached) {
                 recs.push(`⚠️ This password appeared in ${breachResult.count.toLocaleString()} data breaches. Never reuse it.`);
             }
-            if (/(.)\1{2,}/.test(password)) {
+            if (hasRepeatedChars(password)) {
                 recs.push('Avoid repeating the same character multiple times (e.g., "aaa" or "111").');
+            }
+            if (hasSequentialChars(password)) {
+                recs.push('Avoid sequential characters (abc, 123, 789) — attackers test these patterns automatically.');
+            }
+            if (hasKeyboardWalk(password)) {
+                recs.push('Avoid keyboard walk patterns (qwerty, asdf, zxcv) — these are among the first things attackers try.');
+            }
+            if (/^\d+$/.test(password)) {
+                recs.push('⚠️ Numeric-only passwords are extremely weak. Number-only brute force is much faster than mixed charset.');
             }
             if (score >= 80) {
                 recs.push('✅ Strong password! Consider using a password manager to store it securely.');
