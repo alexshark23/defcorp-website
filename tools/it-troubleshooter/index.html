@@ -906,7 +906,7 @@
         // Gemini 2.0 Flash = fastest, newest
         // Gemini 1.5 Flash = stable fallback
         // ──────────────────────────────────────────────
-        const API_KEY = (typeof appConfig !== 'undefined' && appConfig.GEMINI_API_KEY) || '';
+        const API_KEY = (typeof CONFIG !== 'undefined' && CONFIG.GEMINI_API_KEY) || '';
         const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
 
         let currentCategory = 'general';
