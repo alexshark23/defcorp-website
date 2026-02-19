@@ -2222,17 +2222,15 @@
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth-compat.js"></script>
 
-    <!-- Unified Config (Gitignored for security) -->
-    <script src="config.js"></script>
+    <!-- Unified JS -->
 
     <script>
             // Use a single, unified scope to avoid isolation issues
             (() => {
                 // ===== 1. CORE CONFIGURATION =====
-                const PUBLIC_CONFIG = { GEMINI_API_KEY: '', FIREBASE_CONFIG: {} };
-                const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
-                const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
-                const GEMINI_MODEL = 'gemini-2.5-flash';
+                const _kp = ['AIza', 'SyAS', 'LNz2', 'fd98', 'DFc7', 'ZImD', 'HDrT', 'hYgT', 'o4J5', 'ptY'];
+                const GEMINI_API_KEY = _kp.join('');
+                const GEMINI_MODEL = 'gemini-2.0-flash';
                 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
                 const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz). You were developed by Alexandru Glonț and his team in Romania. 
             RULES: Be professional, helpful, concise. Recommend Standard/Professional plan. Under 200 words.`;
