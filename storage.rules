@@ -1,0 +1,23 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Default: no access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // User-specific folders (e.g. for profile photos or documents)
+    match /users/{userId}/{fileName} {
+      allow read: if true; // Publicly viewable (e.g. profile picture)
+      allow write: if request.auth != null && request.auth.uid == userId
+                    && request.resource.size < 5 * 1024 * 1024 // Max 5MB
+                    && request.resource.contentType.matches('image/.*'); // Only images
+    }
+
+    // Public brand assets
+    match /brand/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+  }
+}

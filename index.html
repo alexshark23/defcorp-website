@@ -2221,17 +2221,19 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-functions-compat.js"></script>
 
-    <!-- Unified JS -->
+    <!-- Unified Config (Gitignored for security) -->
+    <script src="config.js"></script>
 
     <script>
             // Use a single, unified scope to avoid isolation issues
             (() => {
                 // ===== 1. CORE CONFIGURATION =====
-                const _kp = ['AIza', 'SyAS', 'LNz2', 'fd98', 'DFc7', 'ZImD', 'HDrT', 'hYgT', 'o4J5', 'ptY'];
-                const GEMINI_API_KEY = _kp.join('');
-                const GEMINI_MODEL = 'gemini-2.0-flash';
-                const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+                const PUBLIC_CONFIG = { GEMINI_API_KEY: '', FIREBASE_CONFIG: {} };
+                const appConfig = (typeof CONFIG !== 'undefined') ? CONFIG : PUBLIC_CONFIG;
+                const GEMINI_API_KEY = appConfig.GEMINI_API_KEY || '';
                 const SYSTEM_PROMPT = `You are DEF AI Assistant — the official AI-powered business assistant for DEF Corp (defcorp.xyz). You were developed by Alexandru Glonț and his team in Romania. 
             RULES: Be professional, helpful, concise. Recommend Standard/Professional plan. Under 200 words.`;
 
@@ -2402,10 +2404,12 @@
 
                 // ===== 4. FIREBASE AUTH =====
                 let auth = null;
+                let db = null;
                 try {
                     if (appConfig.FIREBASE_CONFIG?.apiKey) {
                         if (!firebase.apps.length) firebase.initializeApp(appConfig.FIREBASE_CONFIG);
                         auth = firebase.auth();
+                        db = firebase.firestore();
                         const googleProvider = new firebase.auth.GoogleAuthProvider();
 
                         window.googleSignIn = async () => {
@@ -2436,6 +2440,10 @@
                                 chatFab?.classList.add('hidden');
                                 const nameDisplay = document.getElementById('userNameDisplay');
                                 if (nameDisplay) nameDisplay.textContent = user.displayName || user.email.split('@')[0];
+                                const emailDisplay = document.getElementById('userEmailDisplay');
+                                if (emailDisplay) emailDisplay.textContent = user.email || '';
+                                const welcomeEl = document.getElementById('welcomeName');
+                                if (welcomeEl) welcomeEl.textContent = user.displayName || user.email.split('@')[0];
 
                                 // Sync Profile Inputs
                                 const pName = document.getElementById('profileName');
@@ -2464,6 +2472,14 @@
 
                             try {
                                 if (isReg) {
+                                    const hasLen = pass.length >= 8;
+                                    const hasUpper = /[A-Z]/.test(pass);
+                                    const hasNum = /[0-9]/.test(pass);
+                                    const hasSpecial = /[^A-Za-z0-9]/.test(pass);
+                                    if (!hasLen || !hasUpper || !hasNum || !hasSpecial) {
+                                        if (errEl) errEl.textContent = 'Password must be 8+ chars with an uppercase letter, number, and special character.';
+                                        return;
+                                    }
                                     const res = await auth.createUserWithEmailAndPassword(email, pass);
                                     if (name) await res.user.updateProfile({ displayName: name });
                                     if (succEl) succEl.textContent = "Account created! Logging in...";
@@ -2504,6 +2520,8 @@
                                 const credential = firebase.auth.EmailAuthProvider.credential(auth.currentUser.email, currentPass);
                                 await auth.currentUser.reauthenticateWithCredential(credential);
                                 await auth.currentUser.updatePassword(newPass);
+                                document.getElementById('currentPass').value = '';
+                                document.getElementById('newPass').value = '';
                                 if (msg) {
                                     msg.textContent = "Password updated!";
                                     msg.className = "text-xs text-center mt-1 text-primary";
@@ -2526,54 +2544,115 @@
                     }
                 } catch (e) { console.warn("Firebase offline", e); }
 
-                // ===== 5. CHAT ENGINE =====
+                // ===== 5. CONTACT FORM =====
+                document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const form = e.target;
+                    const submitBtn = document.getElementById('submitBtn');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = 'Sending... <span class="material-icons-outlined text-sm">hourglass_top</span>';
+                    }
+                    try {
+                        if (db) {
+                            await db.collection('leads').add({
+                                name: form.name.value,
+                                email: form.email.value,
+                                service: form.service.value,
+                                message: form.message.value,
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } else {
+                            console.warn('Firestore unavailable, falling back to mailto');
+                            const s = encodeURIComponent('Service Request: ' + form.service.value);
+                            const b = encodeURIComponent('Name: ' + form.name.value + ' | Email: ' + form.email.value + ' | Message: ' + form.message.value);
+                            window.location.href = 'mailto:contact@defcorp.xyz?subject=' + s + '&body=' + b;
+                        }
+                        form.classList.add('hidden');
+                        document.getElementById('formSuccess')?.classList.remove('hidden');
+                    } catch (err) {
+                        console.error('Contact form error:', err);
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'Send Message <span class="material-icons-outlined text-sm">send</span>';
+                        }
+                    }
+                });
+
+                // ===== 6. CHAT ENGINE (Secure Firebase Proxy) =====
                 let conversationHistory = [];
                 let isChatLoading = false;
                 const chatMessages = document.getElementById('chatMessages');
                 const chatInput = document.getElementById('chatInput');
+                const chatSendBtn = document.getElementById('chatSend');
 
                 const addMessage = (text, sender) => {
                     if (!chatMessages) return;
                     const div = document.createElement('div');
-                    div.className = `chat-msg ${sender}`;
-                    div.innerHTML = sender === 'bot' ? text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : text;
+                    div.className = `chat-msg ${sender} reveal visible`;
+                    if (sender === 'bot') {
+                        // Basic markdown-like formatting for bold and links
+                        div.innerHTML = text
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-primary underline" target="_blank">$1</a>')
+                            .replace(/\n/g, '<br>');
+                    } else {
+                        div.textContent = text;
+                    }
                     chatMessages.appendChild(div);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 };
 
                 const sendMessage = async () => {
                     const text = chatInput?.value.trim();
-                    if (!text || isChatLoading || !GEMINI_API_KEY) return;
+                    if (!text || isChatLoading) return;
+
+                    // Check authentication (Required for secure proxy)
+                    if (!auth || !auth.currentUser) {
+                        addMessage('Te rugăm să te autentifici în DEF Portal pentru a folosi asistentul AI.', 'bot');
+                        toggleLoginModal();
+                        return;
+                    }
+
                     addMessage(text, 'user');
                     chatInput.value = '';
                     isChatLoading = true;
+                    if (chatSendBtn) chatSendBtn.disabled = true;
 
                     const typing = document.createElement('div');
-                    typing.className = 'typing-indicator';
+                    typing.className = 'typing-indicator reveal visible';
                     typing.innerHTML = '<span></span><span></span><span></span>';
                     chatMessages.appendChild(typing);
 
                     try {
-                        const response = await fetch(API_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                                contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
-                            })
+                        // Call Secure Proxy instead of direct API
+                        const chatProxy = firebase.functions().httpsCallable('chatProxy');
+                        const result = await chatProxy({
+                            contents: [...conversationHistory, { role: 'user', parts: [{ text }] }]
                         });
-                        const data = await response.json();
-                        const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Eroare AI.";
-                        conversationHistory.push({ role: 'user', parts: [{ text }] }, { role: 'model', parts: [{ text: botText }] });
-                        if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
+
+                        typing.remove();
+                        const botText = result.data.candidates?.[0]?.content?.parts?.[0]?.text || "Eroare la procesarea răspunsului.";
+
                         addMessage(botText, 'bot');
-                    } catch (e) { addMessage("Eroare de conexiune.", "bot"); }
-                    typing.remove();
-                    isChatLoading = false;
+
+                        conversationHistory.push(
+                            { role: 'user', parts: [{ text }] },
+                            { role: 'model', parts: [{ text: botText }] }
+                        );
+                        if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
+                    } catch (e) {
+                        typing.remove();
+                        console.error("Chat Error:", e);
+                        addMessage(`⚠️ ${e.message || "Eroare de conexiune la server."}`, "bot");
+                    } finally {
+                        isChatLoading = false;
+                        if (chatSendBtn) chatSendBtn.disabled = false;
+                    }
                 };
 
                 document.getElementById('chatSend')?.addEventListener('click', sendMessage);
-                chatInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+                chatInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
                 document.querySelectorAll('.chat-suggestion-btn').forEach(btn => {
                     btn.addEventListener('click', () => { if (chatInput) { chatInput.value = btn.dataset.msg; sendMessage(); } });
                 });
