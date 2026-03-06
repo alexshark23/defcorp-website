@@ -970,8 +970,8 @@
 
             <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
                 <div class="reveal">
-                    <h1 class="text-6xl lg:text-9xl font-bold leading-tight mb-8">
-                        ALEXANDRU <span class="text-primary tracking-tighter">GLONT</span>
+                    <h1 class="text-5xl lg:text-7xl font-bold leading-tight mb-6 tracking-tight">
+                        ALEXANDRU <span class="text-primary">GLONT</span>
                     </h1>
                     <p
                         class="text-xl md:text-2xl text-secondary mb-12 max-w-xl mx-auto leading-relaxed border-l-2 border-primary/30 pl-8">
@@ -1008,12 +1008,11 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 stagger">
                     <!-- Project 1: Currency Converter Video -->
-                    <div class="group relative rounded-2xl overflow-hidden border border-primary/20 bg-background-dark/40 backdrop-blur-md shadow-2xl transition-all hover:border-primary/50 cursor-pointer"
+                    <div class="group relative rounded-2xl overflow-hidden border border-primary/10 bg-background-dark/40 backdrop-blur-md shadow-2xl transition-all hover:border-primary/30 cursor-pointer"
                         onclick="openVideoModal('assets/videos/currency_converter.mp4')">
                         <div class="aspect-video relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1611974714151-50e5088c4b18?q=80&w=1000&auto=format&fit=crop"
-                                alt="Currency Converter"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60">
+                            <img src="assets/images/currency-preview.png" alt="Currency Converter Dashboard"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                             <div
                                 class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-80">
                             </div>
@@ -1317,16 +1316,21 @@
 
                     window.openVideoModal = (src) => {
                         if (!videoModal || !modalVideo) return;
+                        modalVideo.pause();
                         modalVideo.src = src;
                         modalVideo.load();
+
                         videoModal.classList.remove('hidden');
                         setTimeout(() => {
                             videoModal.classList.remove('opacity-0');
                             const playPromise = modalVideo.play();
                             if (playPromise !== undefined) {
-                                playPromise.catch(() => { modalVideo.controls = true; });
+                                playPromise.catch(() => {
+                                    modalVideo.controls = true;
+                                    console.log("Auto-play blocked, showing controls.");
+                                });
                             }
-                        }, 100);
+                        }, 50);
                         document.body.style.overflow = 'hidden';
                     };
 
@@ -1355,8 +1359,7 @@
             </button>
             <div
                 class="w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative">
-                <video id="modalVideo" controls class="w-full h-full">
-                    <source src="" type="video/mp4">
+                <video id="modalVideo" controls playsinline class="w-full h-full bg-black">
                     Your browser does not support the video tag.
                 </video>
             </div>
