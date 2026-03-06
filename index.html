@@ -1008,32 +1008,32 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 stagger">
                     <!-- Project 1: Currency Converter Video -->
-                    <div class="group relative rounded-2xl overflow-hidden border border-primary/10 bg-background-dark/40 backdrop-blur-md shadow-2xl transition-all hover:border-primary/30 cursor-pointer"
+                    <div class="group relative rounded-2xl overflow-hidden border border-primary/20 bg-background-dark/40 backdrop-blur-md shadow-2xl transition-all hover:border-primary/50 cursor-pointer"
                         onclick="openVideoModal('assets/videos/currency_converter.mp4')">
-                        <div class="aspect-video relative overflow-hidden">
+                        <div class="aspect-video relative overflow-hidden bg-black/40">
                             <img src="assets/images/currency-preview.png" alt="Currency Converter Dashboard"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80">
                             <div
-                                class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-80">
+                                class="absolute inset-0 bg-gradient-to-t from-background-dark/80 via-transparent to-transparent opacity-90">
                             </div>
                             <!-- Play Button Overlay -->
                             <div class="absolute inset-0 flex items-center justify-center">
                                 <div
-                                    class="w-16 h-16 bg-primary/20 backdrop-blur-md rounded-full flex items-center justify-center border border-primary/40 group-hover:scale-110 transition-all">
-                                    <span class="material-icons-outlined text-primary text-4xl">play_arrow</span>
+                                    class="w-20 h-20 bg-primary/20 backdrop-blur-md rounded-full flex items-center justify-center border border-primary/40 group-hover:scale-110 group-hover:bg-primary/30 transition-all shadow-[0_0_30px_rgba(19,200,236,0.3)]">
+                                    <span class="material-icons-outlined text-primary text-5xl">play_arrow</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="p-8 border-t border-primary/10">
+                        <div class="p-8 border-t border-primary/10 bg-gradient-to-b from-white/[0.02] to-transparent">
                             <div class="flex items-center gap-3 mb-3">
                                 <span
-                                    class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest border border-primary/20 rounded">Video
+                                    class="px-2.5 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest border border-primary/20 rounded-md">Video
                                     Demo</span>
-                                <span class="text-xs text-muted">March 2026</span>
+                                <span class="text-xs text-muted font-medium opacity-60">March 2026</span>
                             </div>
                             <h4 class="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">USD ↔ MXN
                                 Converter</h4>
-                            <p class="text-secondary text-sm leading-relaxed">
+                            <p class="text-secondary/80 text-sm leading-relaxed">
                                 High-performance currency dashboard with live exchange rates and historical data
                                 visualization.
                             </p>
@@ -1315,22 +1315,28 @@
                     const modalVideo = document.getElementById('modalVideo');
 
                     window.openVideoModal = (src) => {
+                        const videoModal = document.getElementById('videoModal');
+                        const modalVideo = document.getElementById('modalVideo');
                         if (!videoModal || !modalVideo) return;
+
                         modalVideo.pause();
-                        modalVideo.src = src;
+                        modalVideo.innerHTML = '';
+                        const source = document.createElement('source');
+                        source.src = src;
+                        source.type = 'video/mp4';
+                        modalVideo.appendChild(source);
                         modalVideo.load();
 
                         videoModal.classList.remove('hidden');
-                        setTimeout(() => {
+                        videoModal.classList.add('flex');
+
+                        requestAnimationFrame(() => {
                             videoModal.classList.remove('opacity-0');
-                            const playPromise = modalVideo.play();
-                            if (playPromise !== undefined) {
-                                playPromise.catch(() => {
-                                    modalVideo.controls = true;
-                                    console.log("Auto-play blocked, showing controls.");
-                                });
-                            }
-                        }, 50);
+                            modalVideo.play().catch((err) => {
+                                modalVideo.controls = true;
+                                console.warn("Playback blocked:", err);
+                            });
+                        });
                         document.body.style.overflow = 'hidden';
                     };
 
@@ -1359,7 +1365,7 @@
             </button>
             <div
                 class="w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative">
-                <video id="modalVideo" controls playsinline class="w-full h-full bg-black">
+                <video id="modalVideo" controls playsinline class="w-full h-full bg-black rounded-xl">
                     Your browser does not support the video tag.
                 </video>
             </div>
