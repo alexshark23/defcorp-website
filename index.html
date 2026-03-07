@@ -1310,52 +1310,44 @@
                         document.getElementById('mobileMenu')?.classList.toggle('open');
                     });
 
-                    // Video Modal Logic (Fixing redrawing and playback)
-                    const videoModal = document.getElementById('videoModal');
-                    const modalVideo = document.getElementById('modalVideo');
+                    // Simplified Video Modal Logic
+                    const vModal = document.getElementById('videoModal');
+                    const vVideo = document.getElementById('modalVideo');
 
                     window.openVideoModal = (src) => {
-                        if (!videoModal || !modalVideo) return;
+                        if (!vModal || !vVideo) return;
 
-                        modalVideo.pause();
-                        modalVideo.innerHTML = ''; // Clear existing sources
+                        vVideo.src = src;
+                        vVideo.load();
 
-                        const source = document.createElement('source');
-                        source.src = src;
-                        source.type = 'video/mp4';
-                        modalVideo.appendChild(source);
-                        modalVideo.load();
+                        vModal.classList.remove('hidden');
+                        vModal.classList.add('flex');
 
-                        videoModal.classList.remove('hidden');
-                        videoModal.classList.add('flex');
-
-                        requestAnimationFrame(() => {
-                            videoModal.classList.remove('opacity-0');
-                            modalVideo.play().catch((err) => {
-                                modalVideo.controls = true;
-                                console.warn("Playback blocked:", err);
+                        setTimeout(() => {
+                            vModal.classList.remove('opacity-0');
+                            vVideo.play().catch(err => {
+                                console.warn("Autoplay blocked", err);
+                                vVideo.controls = true;
                             });
-                        });
+                        }, 50);
                         document.body.style.overflow = 'hidden';
                     };
 
                     window.closeVideoModal = () => {
-                        if (!videoModal || !modalVideo) return;
+                        if (!vModal || !vVideo) return;
 
-                        videoModal.classList.add('opacity-0');
-                        modalVideo.pause();
+                        vModal.classList.add('opacity-0');
+                        vVideo.pause();
 
                         setTimeout(() => {
-                            videoModal.classList.remove('flex');
-                            videoModal.classList.add('hidden');
-                            modalVideo.innerHTML = ''; // Properly clear inner source
-                            modalVideo.src = '';      // Clear src attribute
+                            vModal.classList.add('hidden');
+                            vModal.classList.remove('flex');
+                            vVideo.src = '';
+                            document.body.style.overflow = '';
                         }, 500);
-
-                        document.body.style.overflow = '';
                     };
 
-                    videoModal?.addEventListener('click', (e) => { if (e.target === videoModal) window.closeVideoModal(); });
+                    vModal?.addEventListener('click', (e) => { if (e.target === vModal) window.closeVideoModal(); });
                     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.closeVideoModal(); });
                 })();
         </script>
