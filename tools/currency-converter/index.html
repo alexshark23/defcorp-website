@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USD ↔ MXN — Live Currency Converter</title>
+    <meta name="description" content="Convert USD to MXN and MXN to USD with live exchange rates and historical chart.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0F1117;
+            --surface: #1A1D27;
+            --surface-2: #232733;
+            --surface-3: #2C3040;
+            --primary: #4F8CFF;
+            --primary-light: rgba(79, 140, 255, 0.12);
+            --text: #E8EAED;
+            --text-secondary: #9AA0AE;
+            --text-muted: #5F6470;
+            --border: #2C3040;
+            --border-light: #353949;
+            --green: #34D399;
+            --green-bg: rgba(52, 211, 153, 0.1);
+            --red: #F87171;
+            --red-bg: rgba(248, 113, 113, 0.1);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== DASHBOARD GRID ===== */
+        .dashboard {
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            grid-template-columns: 360px 1fr;
+            grid-template-areas:
+                "header header"
+                "converter chart";
+            gap: 0;
+            padding: 12px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .dash-header {
+            grid-area: header;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px 12px;
+        }
+
+        .dash-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dash-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), #7C4DFF);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .dash-logo h1 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .dash-logo h1 span {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .dash-flags {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 20px;
+        }
+
+        .dash-flags .pair-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--green);
+            background: var(--green-bg);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+
+        .live-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        /* ===== LEFT: CONVERTER ===== */
+        .converter-panel {
+            grid-area: converter;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            margin-right: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .converter-body {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Rate Banner */
+        .rate-banner {
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .rate-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .rate-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .rate-value small {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .rate-timestamp {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: right;
+            line-height: 1.5;
+        }
+
+        /* Currency Input */
+        .curr-group {
+            margin-bottom: 8px;
+        }
+
+        .curr-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .curr-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .curr-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface-2);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0 14px;
+            min-width: 120px;
+        }
+
+        .curr-badge .flag {
+            font-size: 22px;
+        }
+
+        .curr-badge .c-code {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .curr-badge .c-name {
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        .curr-input {
+            flex: 1;
+        }
+
+        .curr-input input {
+            width: 100%;
+            height: 48px;
+            background: var(--surface-2);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0 14px;
+            font-size: 22px;
+            font-weight: 700;
+            font-family: inherit;
+            color: var(--text);
+            outline: none;
+            transition: all var(--transition);
+            text-align: right;
+        }
+
+        .curr-input input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .curr-input input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* Swap */
+        .swap-row {
+            display: flex;
+            justify-content: center;
+            padding: 2px 0;
+        }
+
+        .swap-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border);
+            background: var(--surface-2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            transition: all var(--transition);
+        }
+
+        .swap-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: rotate(180deg);
+        }
+
+        .swap-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Quick Chips */
+        .quick-chips {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .q-chip {
+            background: var(--surface-3);
+            border: none;
+            border-radius: 100px;
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all var(--transition);
+        }
+
+        .q-chip:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Result */
+        .result-strip {
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-top: auto;
+        }
+
+        .result-main {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .r-from {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .r-eq {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .r-to {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .r-code {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .r-inverse {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ===== RIGHT: CHART ===== */
+        .chart-panel {
+            grid-area: chart;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            padding: 14px 18px 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .chart-title-area {
+            flex: 1;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .chart-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .chart-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .chart-change.up {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .chart-change.down {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .chart-change svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .chart-periods {
+            display: flex;
+            gap: 2px;
+            padding: 8px 18px 0;
+        }
+
+        .p-btn {
+            background: none;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all var(--transition);
+        }
+
+        .p-btn:hover {
+            background: var(--surface-3);
+            color: var(--text-secondary);
+        }
+
+        .p-btn.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .chart-wrap {
+            flex: 1;
+            padding: 4px 10px 6px;
+            position: relative;
+            min-height: 0;
+        }
+
+        .chart-wrap canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .chart-loading {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 17, 23, 0.7);
+            z-index: 5;
+        }
+
+        .chart-loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .chart-footer {
+            padding: 0 18px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .hl-group {
+            display: flex;
+            gap: 14px;
+        }
+
+        .hl-val {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-left: 3px;
+        }
+
+        /* ===== LOADING ===== */
+        .load-ov {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 17, 23, 0.7);
+            border-radius: var(--radius-lg);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .load-ov.show {
+            display: flex;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%) translateY(60px);
+            background: var(--surface-2);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            transition: transform 0.25s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .result-flash {
+            animation: rPop 0.35s ease-out;
+        }
+
+        @keyframes rPop {
+            0% {
+                transform: scale(0.96);
+                opacity: 0.5;
+            }
+
+            60% {
+                transform: scale(1.01);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 820px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+                grid-template-areas: "header" "converter" "chart";
+                height: auto;
+                min-height: 100vh;
+            }
+
+            html,
+            body {
+                overflow: auto;
+            }
+
+            .converter-panel {
+                margin-right: 0;
+                margin-bottom: 12px;
+            }
+
+            .chart-wrap {
+                min-height: 220px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard {
+                padding: 8px;
+            }
+
+            .curr-row {
+                flex-direction: column;
+            }
+
+            .dash-flags {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <!-- HEADER -->
+        <div class="dash-header">
+            <div class="dash-logo">
+                <div class="dash-logo-icon">💱</div>
+                <h1>USD <span>↔</span> MXN</h1>
+            </div>
+            <div class="dash-flags">
+                <span>🇺🇸</span>
+                <span style="color:var(--text-muted);font-size:14px;">⇄</span>
+                <span>🇲🇽</span>
+                <span class="pair-label">US Dollar / Mexican Peso</span>
+            </div>
+            <div class="live-badge">
+                <span class="dot"></span>
+                <span id="liveBadgeText">Live Rates</span>
+            </div>
+        </div>
+
+        <!-- LEFT: CONVERTER -->
+        <div class="converter-panel">
+            <div class="load-ov" id="loadingOverlay">
+                <div class="spinner"></div>
+            </div>
+
+            <div class="converter-body">
+                <!-- Rate Banner -->
+                <div class="rate-banner">
+                    <div>
+                        <div class="rate-label">Exchange Rate</div>
+                        <div class="rate-value" id="rateDisplay">—</div>
+                    </div>
+                    <div class="rate-timestamp" id="rateTimestamp">Fetching...</div>
+                </div>
+
+                <!-- FROM -->
+                <div class="curr-group">
+                    <span class="curr-label" id="fromLabel">US Dollar</span>
+                    <div class="curr-row">
+                        <div class="curr-badge">
+                            <span class="flag" id="fromFlag">🇺🇸</span>
+                            <div>
+                                <div class="c-code" id="fromCode">USD</div>
+                                <div class="c-name" id="fromName">US Dollar</div>
+                            </div>
+                        </div>
+                        <div class="curr-input">
+                            <input type="number" id="fromAmount" placeholder="0.00" value="1" oninput="convert()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SWAP -->
+                <div class="swap-row">
+                    <button class="swap-btn" onclick="swapCurrencies()" title="Swap USD ↔ MXN">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- TO -->
+                <div class="curr-group">
+                    <span class="curr-label" id="toLabel">Mexican Peso</span>
+                    <div class="curr-row">
+                        <div class="curr-badge">
+                            <span class="flag" id="toFlag">🇲🇽</span>
+                            <div>
+                                <div class="c-code" id="toCode">MXN</div>
+                                <div class="c-name" id="toName">Mexican Peso</div>
+                            </div>
+                        </div>
+                        <div class="curr-input">
+                            <input type="number" id="toAmount" placeholder="0.00" oninput="reverseConvert()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Chips -->
+                <div class="quick-chips">
+                    <button class="q-chip" onclick="setAmt(1)">1</button>
+                    <button class="q-chip" onclick="setAmt(10)">10</button>
+                    <button class="q-chip" onclick="setAmt(100)">100</button>
+                    <button class="q-chip" onclick="setAmt(500)">500</button>
+                    <button class="q-chip" onclick="setAmt(1000)">1K</button>
+                    <button class="q-chip" onclick="setAmt(5000)">5K</button>
+                    <button class="q-chip" onclick="setAmt(10000)">10K</button>
+                </div>
+
+                <!-- Result -->
+                <div class="result-strip">
+                    <div class="result-main" id="resultMain">
+                        <span class="r-from" id="rFrom">1 USD</span>
+                        <span class="r-eq">=</span>
+                        <span class="r-to" id="rTo">—</span>
+                        <span class="r-code" id="rCode">MXN</span>
+                    </div>
+                    <div class="r-inverse" id="rInverse">1 MXN = — USD</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: CHART -->
+        <div class="chart-panel">
+            <div class="chart-header">
+                <div class="chart-title-area">
+                    <div class="chart-title" id="chartTitle">USD → MXN</div>
+                    <div class="chart-subtitle" id="chartSubtitle">Past month</div>
+                </div>
+                <div class="chart-change" id="chartChange">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="chartIcon">
+                        <path d="M7 17l5-5 5 5" />
+                    </svg>
+                    <span id="chartChangeText">—</span>
+                </div>
+            </div>
+
+            <div class="chart-periods">
+                <button class="p-btn" data-period="7" onclick="setPeriod(7)">1W</button>
+                <button class="p-btn active" data-period="30" onclick="setPeriod(30)">1M</button>
+                <button class="p-btn" data-period="90" onclick="setPeriod(90)">3M</button>
+                <button class="p-btn" data-period="180" onclick="setPeriod(180)">6M</button>
+                <button class="p-btn" data-period="365" onclick="setPeriod(365)">1Y</button>
+                <button class="p-btn" data-period="1825" onclick="setPeriod(1825)">5Y</button>
+            </div>
+
+            <div class="chart-wrap">
+                <div class="chart-loading" id="chartLoading">
+                    <div class="spinner"></div>
+                </div>
+                <canvas id="rateChart"></canvas>
+            </div>
+
+            <div class="chart-footer">
+                <span id="chartRange"></span>
+                <div class="hl-group">
+                    <span>High:<span class="hl-val" id="cHigh">—</span></span>
+                    <span>Low:<span class="hl-val" id="cLow">—</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+    <script>
+        // ═══════════════════════════════════
+        // STATE — USD ↔ MXN only
+        // ═══════════════════════════════════
+        let isSwapped = false; // false = USD→MXN, true = MXN→USD
+        let rate = null;       // USD→MXN rate
+        let lastFetchTime = null;
+        let currentPeriod = 30;
+        let chart = null;
+
+        const FROM_DEFAULT = { code: 'USD', name: 'US Dollar', flag: '🇺🇸' };
+        const TO_DEFAULT = { code: 'MXN', name: 'Mexican Peso', flag: '🇲🇽' };
+
+        function getFrom() { return isSwapped ? TO_DEFAULT : FROM_DEFAULT; }
+        function getTo() { return isSwapped ? FROM_DEFAULT : TO_DEFAULT; }
+
+        // ═══════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchRate();
+            fetchHistorical(currentPeriod);
+        });
+
+        // ═══════════════════════════════════
+        // LIVE RATE (Frankfurter / ECB)
+        // ═══════════════════════════════════
+        async function fetchRate() {
+            showLoading(true);
+            try {
+                const resp = await fetch('https://api.frankfurter.dev/v1/latest?base=USD&to=MXN');
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+                rate = data.rates.MXN;
+                lastFetchTime = new Date();
+                convert();
+                updateRateBanner();
+                updateTimestamp();
+            } catch (err) {
+                toast('⚠️ Could not fetch rate');
+                console.error(err);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // ═══════════════════════════════════
+        // CONVERSION
+        // ═══════════════════════════════════
+        function convert() {
+            if (rate === null) return;
+            const input = parseFloat(document.getElementById('fromAmount').value);
+            if (isNaN(input) || input === 0) {
+                document.getElementById('toAmount').value = '';
+                document.getElementById('rTo').textContent = '—';
+                return;
+            }
+
+            const result = isSwapped ? input / rate : input * rate;
+            const effectiveRate = isSwapped ? 1 / rate : rate;
+            const inverseRate = isSwapped ? rate : 1 / rate;
+
+            document.getElementById('toAmount').value = fmtIn(result);
+            document.getElementById('rFrom').textContent = `${fmtD(input)} ${getFrom().code}`;
+            document.getElementById('rTo').textContent = fmtD(result);
+            document.getElementById('rCode').textContent = getTo().code;
+            document.getElementById('rInverse').textContent = `1 ${getTo().code} = ${fmtD(inverseRate)} ${getFrom().code}`;
+
+            flashResult();
+        }
+
+        function reverseConvert() {
+            if (rate === null) return;
+            const toVal = parseFloat(document.getElementById('toAmount').value);
+            if (isNaN(toVal)) { document.getElementById('fromAmount').value = ''; return; }
+
+            const fromVal = isSwapped ? toVal * rate : toVal / rate;
+            document.getElementById('fromAmount').value = fmtIn(fromVal);
+
+            document.getElementById('rFrom').textContent = `${fmtD(fromVal)} ${getFrom().code}`;
+            document.getElementById('rTo').textContent = fmtD(toVal);
+            document.getElementById('rCode').textContent = getTo().code;
+        }
+
+        // ═══════════════════════════════════
+        // SWAP
+        // ═══════════════════════════════════
+        function swapCurrencies() {
+            isSwapped = !isSwapped;
+            const f = getFrom(), t = getTo();
+
+            document.getElementById('fromFlag').textContent = f.flag;
+            document.getElementById('fromCode').textContent = f.code;
+            document.getElementById('fromName').textContent = f.name;
+            document.getElementById('fromLabel').textContent = f.name;
+            document.getElementById('toFlag').textContent = t.flag;
+            document.getElementById('toCode').textContent = t.code;
+            document.getElementById('toName').textContent = t.name;
+            document.getElementById('toLabel').textContent = t.name;
+
+            // Swap input values
+            const fv = document.getElementById('fromAmount').value;
+            const tv = document.getElementById('toAmount').value;
+            document.getElementById('fromAmount').value = tv;
+            document.getElementById('toAmount').value = fv;
+
+            convert();
+            updateRateBanner();
+            fetchHistorical(currentPeriod);
+        }
+
+        function setAmt(val) {
+            document.getElementById('fromAmount').value = val;
+            convert();
+        }
+
+        // ═══════════════════════════════════
+        // UI UPDATES
+        // ═══════════════════════════════════
+        function updateRateBanner() {
+            if (rate === null) return;
+            const effectiveRate = isSwapped ? 1 / rate : rate;
+            document.getElementById('rateDisplay').innerHTML =
+                `1 ${getFrom().code} = <small>${fmtD(effectiveRate)} ${getTo().code}</small>`;
+        }
+
+        function updateTimestamp() {
+            if (!lastFetchTime) return;
+            const t = lastFetchTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('rateTimestamp').innerHTML = `ECB data<br>Updated ${t}`;
+            document.getElementById('liveBadgeText').textContent = `Live · ${t}`;
+        }
+
+        // ═══════════════════════════════════
+        // CHART — Historical
+        // ═══════════════════════════════════
+        async function fetchHistorical(days) {
+            document.getElementById('chartLoading').classList.add('show');
+            const end = new Date(), start = new Date();
+            start.setDate(end.getDate() - days);
+            const fmt = d => d.toISOString().split('T')[0];
+
+            const from = getFrom().code, to = getTo().code;
+            // Always fetch USD→MXN and flip if needed
+            const apiFrom = 'USD', apiTo = 'MXN';
+
+            try {
+                const url = `https://api.frankfurter.dev/v1/${fmt(start)}..${fmt(end)}?from=${apiFrom}&to=${apiTo}`;
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+                const dates = Object.keys(data.rates).sort();
+                let values = dates.map(d => data.rates[d][apiTo]);
+
+                // If swapped (MXN→USD), invert
+                if (isSwapped) values = values.map(v => 1 / v);
+
+                renderChart(dates, values, days);
+                updateChartMeta(dates, values, days);
+            } catch (err) {
+                console.error(err);
+                toast('⚠️ Chart data unavailable');
+            } finally {
+                document.getElementById('chartLoading').classList.remove('show');
+            }
+        }
+
+        function renderChart(dates, values, days) {
+            const ctx = document.getElementById('rateChart').getContext('2d');
+            const first = values[0], last = values[values.length - 1];
+            const isUp = last >= first;
+            const color = isUp ? '#34D399' : '#F87171';
+            const grad = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight || 300);
+            grad.addColorStop(0, isUp ? 'rgba(52,211,153,0.18)' : 'rgba(248,113,113,0.18)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+            if (chart) chart.destroy();
+
+            const from = getFrom().code, to = getTo().code;
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        data: values,
+                        borderColor: color,
+                        backgroundColor: grad,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: color,
+                        pointHoverBorderColor: '#1A1D27',
+                        pointHoverBorderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#232733',
+                            titleColor: '#9AA0AE',
+                            bodyColor: '#E8EAED',
+                            borderColor: '#353949',
+                            borderWidth: 1,
+                            titleFont: { size: 10, weight: '400' },
+                            bodyFont: { size: 13, weight: '600' },
+                            padding: { top: 6, bottom: 6, left: 10, right: 10 },
+                            cornerRadius: 6,
+                            displayColors: false,
+                            callbacks: {
+                                title: (items) => new Date(items[0].label).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                                label: (item) => `1 ${from} = ${item.parsed.y.toFixed(4)} ${to}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: days <= 7 ? 'day' : days <= 90 ? 'week' : 'month',
+                                displayFormats: { day: 'MMM d', week: 'MMM d', month: 'MMM yy' }
+                            },
+                            grid: { display: false },
+                            ticks: { color: '#5F6470', font: { size: 10 }, maxTicksLimit: 6 },
+                            border: { display: false },
+                        },
+                        y: {
+                            position: 'right',
+                            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                            ticks: {
+                                color: '#5F6470', font: { size: 10 }, maxTicksLimit: 5,
+                                callback: v => v.toFixed(Math.abs(v) < 1 ? 4 : 2)
+                            },
+                            border: { display: false },
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChartMeta(dates, values, days) {
+            const first = values[0], last = values[values.length - 1];
+            const change = ((last - first) / first) * 100;
+            const isUp = change >= 0;
+            const from = getFrom().code, to = getTo().code;
+
+            document.getElementById('chartTitle').textContent = `${from} → ${to}`;
+            const labels = { 7: 'Past week', 30: 'Past month', 90: 'Past 3 months', 180: 'Past 6 months', 365: 'Past year', 1825: 'Past 5 years' };
+            document.getElementById('chartSubtitle').textContent = labels[days] || `Past ${days} days`;
+
+            const ce = document.getElementById('chartChange');
+            ce.className = `chart-change ${isUp ? 'up' : 'down'}`;
+            document.getElementById('chartChangeText').textContent = `${isUp ? '+' : ''}${change.toFixed(2)}%`;
+            document.getElementById('chartIcon').innerHTML = isUp ? '<path d="M7 17l5-5 5 5"/>' : '<path d="M7 7l5 5 5-5"/>';
+
+            document.getElementById('cHigh').textContent = Math.max(...values).toFixed(4);
+            document.getElementById('cLow').textContent = Math.min(...values).toFixed(4);
+
+            const ds = d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            document.getElementById('chartRange').textContent = `${ds(dates[0])} — ${ds(dates[dates.length - 1])}`;
+        }
+
+        function setPeriod(days) {
+            currentPeriod = days;
+            document.querySelectorAll('.p-btn').forEach(b => b.classList.toggle('active', +b.dataset.period === days));
+            fetchHistorical(days);
+        }
+
+        // ═══════════════════════════════════
+        // UTILS
+        // ═══════════════════════════════════
+        function fmtD(n) {
+            if (Math.abs(n) >= 1000) return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (Math.abs(n) >= 1) return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+            return n.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+        }
+
+        function fmtIn(n) { return Math.abs(n) >= 1 ? parseFloat(n.toFixed(2)) : parseFloat(n.toFixed(6)); }
+
+        function showLoading(s) { document.getElementById('loadingOverlay').classList.toggle('show', s); }
+
+        function flashResult() {
+            const el = document.getElementById('resultMain');
+            el.classList.remove('result-flash');
+            void el.offsetWidth;
+            el.classList.add('result-flash');
+        }
+
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+
+</html>

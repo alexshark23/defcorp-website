@@ -431,12 +431,54 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             transition: all var(--transition);
+            position: relative;
         }
 
         .project-card:hover {
             background: var(--bg-card-hover);
             border-color: var(--border-hover);
             transform: translateY(-4px);
+        }
+
+        a.project-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        a.project-card-link .project-card {
+            cursor: pointer;
+        }
+
+        a.project-card-link .project-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.12);
+        }
+
+        .project-card .live-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 6px;
+        }
+
+        .project-card .live-badge .dot {
+            width: 5px;
+            height: 5px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite ease-in-out;
         }
 
         .project-card h3 {
@@ -469,6 +511,18 @@
             background: rgba(59, 130, 246, 0.08);
             color: var(--accent);
             border: 1px solid rgba(59, 130, 246, 0.12);
+        }
+
+        .projects-sub-label {
+            grid-column: 1 / -1;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            padding: 16px 0 4px;
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
         }
 
         /* ═══════════════════════════════════════════════
@@ -888,34 +942,88 @@
                         <h3>iGaming &amp; Live Casino Operations</h3>
                         <div class="company">Skywind Group &middot; Ezugi</div>
                         <ul>
-                            <li>3+ years in the regulated iGaming industry, operating live studio broadcast environments</li>
-                            <li>Real-time decision making and multi-tasking under high-pressure, live production conditions</li>
+                            <li>3+ years in the regulated iGaming industry, operating live studio broadcast environments
+                            </li>
+                            <li>Real-time decision making and multi-tasking under high-pressure, live production
+                                conditions</li>
                             <li>Professional on-camera communication with global audiences across multiple markets</li>
                             <li>Strict compliance with gaming regulations, SOPs, and quality assurance protocols</li>
-                            <li>Technical proficiency with broadcast equipment, streaming platforms, and studio systems</li>
+                            <li>Technical proficiency with broadcast equipment, streaming platforms, and studio systems
+                            </li>
                             <li>Cross-functional collaboration with floor managers, pit bosses, and technical teams</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </section>
-
         <!-- ═══════ PROJECTS ═══════ -->
         <section class="fi">
             <div class="section-label">Key Projects</div>
             <div class="projects-grid">
-                <div class="project-card">
-                    <h3>DEF Corp Website</h3>
-                    <p>Professional landing page for an AI &amp; Cybersecurity firm. Dark theme with glassmorphism,
-                        Firebase authentication (email + Google), live AI chatbot with Gemini, functional contact form,
-                        and CI/CD deployment.</p>
-                    <div class="project-tags">
-                        <span class="tag">HTML/CSS/JS</span>
-                        <span class="tag">Firebase</span>
-                        <span class="tag">Gemini API</span>
-                        <span class="tag">GitHub Pages</span>
+
+                <!-- ─── Personal / Live Demo Projects ─── -->
+                <a class="project-card-link" href="https://defcorp.xyz/tools/currency-converter/" target="_blank"
+                    rel="noopener">
+                    <div class="project-card">
+                        <div class="live-badge"><span class="dot"></span> Live Demo</div>
+                        <h3>USD ↔ MXN Currency Converter</h3>
+                        <p>Real-time currency dashboard with live exchange rates, bidirectional conversion,
+                            quick-amount presets, and an interactive historical chart (1W–5Y). Single-file deployment.
+                        </p>
+                        <div class="project-tags">
+                            <span class="tag">HTML/CSS/JS</span>
+                            <span class="tag">Chart.js</span>
+                            <span class="tag">REST API</span>
+                            <span class="tag">Dashboard</span>
+                        </div>
                     </div>
-                </div>
+                </a>
+                <a class="project-card-link" href="https://defcorp.xyz/tools/ai-chatbot/" target="_blank"
+                    rel="noopener">
+                    <div class="project-card">
+                        <div class="live-badge"><span class="dot"></span> Live Demo</div>
+                        <h3>Nexus AI — Chatbot Widget</h3>
+                        <p>SaaS-style landing page for an AI chatbot product. Fully functional embedded chatbot demo,
+                            feature cards, pricing section, and smooth micro-animations throughout.</p>
+                        <div class="project-tags">
+                            <span class="tag">HTML/CSS/JS</span>
+                            <span class="tag">AI Chatbot</span>
+                            <span class="tag">Landing Page</span>
+                        </div>
+                    </div>
+                </a>
+                <a class="project-card-link" href="https://defcorp.xyz/servicedesk/" target="_blank" rel="noopener">
+                    <div class="project-card">
+                        <div class="live-badge"><span class="dot"></span> Live Demo</div>
+                        <h3>IT Service Desk Dashboard</h3>
+                        <p>Enterprise help desk simulation with ticket management, priority filtering, detailed
+                            ticket resolution panel, and real-time stats. Dark theme with professional UX.</p>
+                        <div class="project-tags">
+                            <span class="tag">HTML/CSS/JS</span>
+                            <span class="tag">Dashboard</span>
+                            <span class="tag">IT Support</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- ─── Professional / Infrastructure Projects ─── -->
+                <div class="projects-sub-label">Professional &amp; Infrastructure</div>
+
+                <a class="project-card-link" href="https://defcorp.xyz" target="_blank" rel="noopener">
+                    <div class="project-card">
+                        <h3>DEF Corp Website</h3>
+                        <p>Professional landing page for an AI &amp; Cybersecurity firm. Dark theme with glassmorphism,
+                            Firebase authentication (email + Google), live AI chatbot with Gemini, functional contact
+                            form,
+                            and CI/CD deployment.</p>
+                        <div class="project-tags">
+                            <span class="tag">HTML/CSS/JS</span>
+                            <span class="tag">Firebase</span>
+                            <span class="tag">Gemini API</span>
+                            <span class="tag">GitHub Pages</span>
+                        </div>
+                    </div>
+                </a>
                 <div class="project-card">
                     <h3>AI Chatbot — Multi-Model</h3>
                     <p>Chatbot system with multi-model Gemini fallback (2.5 Flash → 2.0 Flash → 1.5 Flash).
@@ -938,7 +1046,7 @@
                     </div>
                 </div>
                 <div class="project-card">
-                    <h3>Security Audit & Hardening</h3>
+                    <h3>Security Audit &amp; Hardening</h3>
                     <p>Complete security audit of a web codebase. Identified and remediated credential exposure,
                         XSS, and authentication issues. Implemented Content Security Policy.</p>
                     <div class="project-tags">

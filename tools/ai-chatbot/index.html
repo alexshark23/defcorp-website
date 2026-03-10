@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI — Intelligent Customer Engagement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">N</div>
+                <span>Nexus<span class="logo-dot">.</span>ai</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Product</a>
+                <a href="#how">How it works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#" class="nav-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                New — GPT-4o Integration Available
+            </div>
+            <h1>Your AI assistant<br>that <span class="text-pop">actually</span> converts</h1>
+            <p>Deploy an intelligent chatbot in 2 minutes. No code needed. Increase conversions by 3x with 24/7
+                AI-powered customer engagement.</p>
+            <div class="hero-buttons">
+                <button class="btn-main" onclick="toggleChat()">
+                    <span>💬</span> Try the Demo
+                </button>
+                <button class="btn-ghost">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5,3 19,12 5,21" />
+                    </svg>
+                    Watch Video
+                </button>
+            </div>
+            <div class="hero-trust">
+                <div class="trust-avatars">
+                    <div class="avatar" style="background:#FF6B6B">A</div>
+                    <div class="avatar" style="background:#4ECDC4">M</div>
+                    <div class="avatar" style="background:#45B7D1">S</div>
+                    <div class="avatar" style="background:#96CEB4">J</div>
+                    <div class="avatar" style="background:#FFEAA7">K</div>
+                </div>
+                <span>Trusted by <strong>3,200+</strong> businesses worldwide</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- METRICS BAR -->
+    <section class="metrics">
+        <div class="metrics-container">
+            <div class="metric">
+                <span class="metric-value">93%</span>
+                <span class="metric-label">Customer Satisfaction</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric">
+                <span class="metric-value">2min</span>
+                <span class="metric-label">Setup Time</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric">
+                <span class="metric-value">3x</span>
+                <span class="metric-label">More Conversions</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric">
+                <span class="metric-value">24/7</span>
+                <span class="metric-label">Always Available</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <div class="section-header">
+                <span class="section-tag">Features</span>
+                <h2>Everything you need to<br><span class="text-pop">delight customers</span></h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card card-1">
+                    <div class="card-icon">🧠</div>
+                    <h3>Learns Your Business</h3>
+                    <p>Feed it your docs, FAQs, and product info. It becomes your best employee in minutes.</p>
+                </div>
+                <div class="feature-card card-2">
+                    <div class="card-icon">⚡</div>
+                    <h3>Instant Answers</h3>
+                    <p>Sub-second response times. Your customers never wait, even at 3 AM on a Sunday.</p>
+                </div>
+                <div class="feature-card card-3">
+                    <div class="card-icon">🎯</div>
+                    <h3>Smart Routing</h3>
+                    <p>Knows when to escalate to a human. Seamless handoff to your support team.</p>
+                </div>
+                <div class="feature-card card-4">
+                    <div class="card-icon">📈</div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Track every conversation. Understand what your customers really want.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════ -->
+    <!-- AI CHATBOT WIDGET           -->
+    <!-- ═══════════════════════════ -->
+
+    <!-- Floating Button -->
+    <div class="chat-fab" id="chatFab" onclick="toggleChat()">
+        <div class="fab-icon" id="fabIcon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" id="fabSvg">
+                <path
+                    d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" />
+            </svg>
+        </div>
+        <div class="fab-ring"></div>
+        <div class="fab-notification" id="fabNotif">1</div>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window" id="chatWindow">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <div class="chat-logo">N</div>
+                <div>
+                    <div class="chat-name">Nexus AI Assistant</div>
+                    <div class="chat-online"><span class="online-dot"></span> Online now</div>
+                </div>
+            </div>
+            <button class="chat-close" onclick="toggleChat()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-body" id="chatMessages"></div>
+
+        <!-- Quick Actions -->
+        <div class="chat-quick" id="chatQuick">
+            <button onclick="sendSuggestion('What services do you offer?')">Our Services</button>
+            <button onclick="sendSuggestion('Show me your pricing plans')">Pricing</button>
+            <button onclick="sendSuggestion('How do I get started?')">Get Started</button>
+            <button onclick="sendSuggestion('I need help with something')">Support</button>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-wrap">
+            <input type="text" id="chatInput" placeholder="Ask me anything..." autocomplete="off"
+                onkeypress="if(event.key==='Enter')sendMessage()">
+            <button class="chat-send" onclick="sendMessage()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="chat-branding">Powered by <strong>Nexus.ai</strong></div>
+    </div>
+
+    <script src="chatbot.js"></script>
+</body>
+
+</html>
